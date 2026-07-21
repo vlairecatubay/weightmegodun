@@ -6,6 +6,7 @@
 <title>WeightMeGodun</title>
 
 
+
 <link rel="manifest" href="manifest.json" />
 <meta name="theme-color" content="#A29CF0" />
 <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png" />
@@ -17,7 +18,9 @@
 <meta name="mobile-web-app-capable" content="yes" />
 
 
+
 <style>
+
 
 
 
@@ -529,8 +532,13 @@ main{ display: block; margin-top: 4px; }
 }
 .chat-bubble.logged{
   align-self: flex-start; background: var(--positive-soft); color: var(--positive);
-  font-weight: 600; border-radius: 18px; display:flex; align-items:center; gap: 7px;
+  font-weight: 600; border-radius: 18px; display:flex; flex-direction: column; gap: 4px;
+  min-width: 180px;
 }
+.chat-item-row{
+  display:flex; justify-content: space-between; gap: 10px; font-size: 12.5px; font-weight: 500;
+}
+.chat-item-row + .chat-item-row{ padding-top: 2px; border-top: 1px solid rgba(255,255,255,0.4); }
 .chat-bubble.pending{ align-self: flex-start; background: var(--bg); color: var(--ink-faint); }
 .typing-dots span{
   display:inline-block; width: 5px; height: 5px; border-radius: 50%; background: var(--ink-faint);
@@ -545,6 +553,25 @@ main{ display: block; margin-top: 4px; }
 .chat-input-row button{ padding: 12px 18px; flex-shrink: 0; }
 
 .chat-log-list{ margin-top: 6px; }
+.mono{ font-family: 'Inter', sans-serif; font-variant-numeric: tabular-nums; }
+
+/* ---------- Calorie log: groups, items, macros, inline edit ---------- */
+.calorie-group{ border-radius: 14px; overflow: hidden; margin-top: 8px; }
+.calorie-group-header{
+  display:flex; justify-content: space-between; padding: 8px 10px;
+  background: var(--bg); font-size: 11.5px; font-weight: 700; color: var(--ink-soft);
+  border-radius: 10px 10px 0 0;
+}
+.calorie-item-row{
+  display:flex; align-items:center; gap: 8px; padding: 11px 10px;
+  border-bottom: 1px solid var(--bg); font-size: 13.5px;
+}
+.calorie-group .calorie-item-row:last-child{ border-bottom: none; }
+.calorie-item-main{ flex: 1; min-width: 0; }
+.macro-line{ font-size: 11px; color: var(--ink-faint); margin-top: 2px; }
+.calorie-edit-row{ background: var(--bg); border-radius: 14px; padding: 12px 10px; margin: 6px 0; }
+.calorie-edit-row label{ margin-bottom: 4px; }
+.calorie-edit-row input{ background: var(--surface); }
 .no-key-note{
   background: var(--bg); border-radius: 16px; padding: 20px; text-align:center; color: var(--ink-soft); font-size: 13px;
 }
@@ -555,9 +582,11 @@ main{ display: block; margin-top: 4px; }
 
 
 
+
 </style>
 </head>
 <body>
+
 
 
 
@@ -651,6 +680,7 @@ main{ display: block; margin-top: 4px; }
           <p class="readout-label">Calories today</p>
           <p class="readout-value" id="calorie-today-readout">—</p>
           <p class="readout-secondary" id="calorie-today-secondary">Tap to log with AI chat →</p>
+          <p class="readout-secondary mono" id="calorie-today-macros" style="margin-top:2px;"></p>
         </div>
       </button>
 
@@ -785,6 +815,7 @@ main{ display: block; margin-top: 4px; }
           <div class="chat-total">
             <div class="chat-total-num" id="chat-today-total">0</div>
             <div class="chat-total-label">kcal today</div>
+            <div class="chat-total-label mono" id="chat-today-macros" style="margin-top:4px;"></div>
           </div>
         </div>
 
@@ -817,6 +848,20 @@ main{ display: block; margin-top: 4px; }
             <div>
               <label for="calorie-description">Note (optional)</label>
               <input type="text" id="calorie-description" placeholder="e.g. Lunch" autocomplete="off" />
+            </div>
+          </div>
+          <div class="field-row">
+            <div>
+              <label for="calorie-protein">Protein (g)</label>
+              <input type="text" id="calorie-protein" inputmode="decimal" placeholder="0" autocomplete="off" />
+            </div>
+            <div>
+              <label for="calorie-carbs">Carbs (g)</label>
+              <input type="text" id="calorie-carbs" inputmode="decimal" placeholder="0" autocomplete="off" />
+            </div>
+            <div>
+              <label for="calorie-fat">Fat (g)</label>
+              <input type="text" id="calorie-fat" inputmode="decimal" placeholder="0" autocomplete="off" />
             </div>
           </div>
           <div class="btn-row">
@@ -918,7 +963,9 @@ main{ display: block; margin-top: 4px; }
 
 
 
+
 <script>
+
 
 
 
@@ -1711,18 +1758,103 @@ function calorieEntriesForDate(date) {
   return state.calories.filter(c => c.date === date);
 }
 
+function sumMacros(entries) {
+  return entries.reduce((acc, c) => {
+    acc.protein += Number(c.protein) || 0;
+    acc.carbs += Number(c.carbs) || 0;
+    acc.fat += Number(c.fat) || 0;
+    return acc;
+  }, { protein: 0, carbs: 0, fat: 0 });
+}
+
+function formatMacroLine(macros) {
+  return 'P ' + Math.round(macros.protein) + 'g · C ' + Math.round(macros.carbs) + 'g · F ' + Math.round(macros.fat) + 'g';
+}
+
 function renderCalorieToday() {
   const readout = document.getElementById('calorie-today-readout');
   const secondary = document.getElementById('calorie-today-secondary');
   const totalEl = document.getElementById('chat-today-total');
+  const macrosEl = document.getElementById('calorie-today-macros');
+  const chatMacrosEl = document.getElementById('chat-today-macros');
   if (!readout) return;
   const todays = todaysCalorieEntries();
   const total = todays.reduce((sum, c) => sum + Number(c.calories), 0);
+  const macros = sumMacros(todays);
   readout.textContent = total > 0 ? total + ' kcal' : '—';
   secondary.textContent = todays.length > 0
     ? todays.length + ' item' + (todays.length === 1 ? '' : 's') + ' logged today'
     : 'Tap to log with AI chat →';
   if (totalEl) totalEl.textContent = total;
+  const macroLine = todays.length > 0 ? formatMacroLine(macros) : '';
+  if (macrosEl) macrosEl.textContent = macroLine;
+  if (chatMacrosEl) chatMacrosEl.textContent = macroLine;
+}
+
+let editingCalorieId = null;
+
+function groupCalorieEntries(entries) {
+  const groups = new Map();
+  entries.forEach(entry => {
+    const key = entry.groupId || entry.id; // legacy entries without groupId: each is its own group
+    if (!groups.has(key)) groups.set(key, []);
+    groups.get(key).push(entry);
+  });
+  return [...groups.values()]
+    .map(items => ({ items, loggedAt: items[0].loggedAt || '' }))
+    .sort((a, b) => (b.loggedAt || '').localeCompare(a.loggedAt || ''));
+}
+
+function calorieItemRowHTML(entry) {
+  const macroBits = [];
+  if (entry.protein) macroBits.push('P ' + entry.protein + 'g');
+  if (entry.carbs) macroBits.push('C ' + entry.carbs + 'g');
+  if (entry.fat) macroBits.push('F ' + entry.fat + 'g');
+  const macroLine = macroBits.length ? `<div class="macro-line">${macroBits.join(' · ')}</div>` : '';
+  return `
+    <div class="calorie-item-row" data-id="${entry.id}">
+      <div class="calorie-item-main">
+        <span class="history-value">${entry.description}</span>
+        ${macroLine}
+      </div>
+      <span class="mono" style="font-weight:700;">${entry.calories} kcal</span>
+      <button class="icon-btn edit-btn" data-id="${entry.id}" aria-label="Edit entry">✎</button>
+      <button class="icon-btn delete-btn" data-id="${entry.id}" aria-label="Delete entry">✕</button>
+    </div>
+  `;
+}
+
+function calorieItemEditHTML(entry) {
+  return `
+    <div class="calorie-edit-row" data-id="${entry.id}">
+      <div class="measure-grid" style="margin-bottom:8px;">
+        <div style="grid-column: 1 / -1;">
+          <label>Name</label>
+          <input type="text" class="edit-description" value="${(entry.description || '').replace(/"/g, '&quot;')}" />
+        </div>
+        <div>
+          <label>Calories</label>
+          <input type="text" inputmode="decimal" class="edit-calories" value="${entry.calories}" />
+        </div>
+        <div>
+          <label>Protein (g)</label>
+          <input type="text" inputmode="decimal" class="edit-protein" value="${entry.protein || 0}" />
+        </div>
+        <div>
+          <label>Carbs (g)</label>
+          <input type="text" inputmode="decimal" class="edit-carbs" value="${entry.carbs || 0}" />
+        </div>
+        <div>
+          <label>Fat (g)</label>
+          <input type="text" inputmode="decimal" class="edit-fat" value="${entry.fat || 0}" />
+        </div>
+      </div>
+      <div class="btn-row" style="margin-top:0;">
+        <button type="button" class="primary edit-save-btn" data-id="${entry.id}" style="padding:8px 16px; font-size:12.5px;">Save</button>
+        <button type="button" class="secondary edit-cancel-btn" style="padding:8px 16px; font-size:12.5px;">Cancel</button>
+      </div>
+    </div>
+  `;
 }
 
 function renderChatLogList() {
@@ -1730,27 +1862,67 @@ function renderChatLogList() {
   if (!list) return;
   list.innerHTML = '';
   const date = selectedLogDate();
-  const entries = [...calorieEntriesForDate(date)].sort((a, b) => (b.loggedAt || '').localeCompare(a.loggedAt || ''));
+  const entries = calorieEntriesForDate(date);
   if (entries.length === 0) {
     list.innerHTML = '<p class="empty-note">Nothing logged on ' + fmtDate(date) + '.</p>';
     return;
   }
-  const total = entries.reduce((sum, c) => sum + Number(c.calories), 0);
+
+  const dayTotal = entries.reduce((sum, c) => sum + Number(c.calories), 0);
+  const dayMacros = sumMacros(entries);
   const totalRow = document.createElement('div');
   totalRow.className = 'history-row';
-  totalRow.style.borderBottom = 'none';
-  totalRow.innerHTML = `<span class="history-value" style="font-weight:700;">Total</span><span class="mono" style="font-weight:800;">${total} kcal</span>`;
+  totalRow.innerHTML = `
+    <div>
+      <span class="history-value" style="font-weight:700;">Total</span>
+      <div class="macro-line">${formatMacroLine(dayMacros)}</div>
+    </div>
+    <span class="mono" style="font-weight:800;">${dayTotal} kcal</span>
+  `;
   list.appendChild(totalRow);
-  entries.forEach(entry => {
-    const row = document.createElement('div');
-    row.className = 'history-row';
-    row.innerHTML = `
-      <span class="history-value">${entry.description}</span>
-      <span class="mono" style="font-weight:700; margin-right:4px;">${entry.calories} kcal</span>
-      <button class="icon-btn delete-btn" data-id="${entry.id}" aria-label="Delete entry">✕</button>
-    `;
-    row.querySelector('.delete-btn').addEventListener('click', () => deleteCalorieEntry(entry.id));
-    list.appendChild(row);
+
+  const groups = groupCalorieEntries(entries);
+  groups.forEach(group => {
+    const groupWrap = document.createElement('div');
+    groupWrap.className = 'calorie-group';
+    if (group.items.length > 1) {
+      const groupTotal = group.items.reduce((s, e) => s + Number(e.calories), 0);
+      const header = document.createElement('div');
+      header.className = 'calorie-group-header';
+      header.innerHTML = `<span>${group.items.length} items</span><span class="mono">${groupTotal} kcal</span>`;
+      groupWrap.appendChild(header);
+    }
+    group.items.forEach(entry => {
+      const row = document.createElement('div');
+      row.innerHTML = entry.id === editingCalorieId ? calorieItemEditHTML(entry) : calorieItemRowHTML(entry);
+      const el = row.firstElementChild;
+      groupWrap.appendChild(el);
+
+      if (entry.id === editingCalorieId) {
+        el.querySelector('.edit-save-btn').addEventListener('click', () => {
+          const updates = {
+            description: el.querySelector('.edit-description').value,
+            calories: parseDecimal(el.querySelector('.edit-calories').value),
+            protein: parseDecimal(el.querySelector('.edit-protein').value),
+            carbs: parseDecimal(el.querySelector('.edit-carbs').value),
+            fat: parseDecimal(el.querySelector('.edit-fat').value)
+          };
+          editingCalorieId = null;
+          editCalorieEntry(entry.id, updates);
+        });
+        el.querySelector('.edit-cancel-btn').addEventListener('click', () => {
+          editingCalorieId = null;
+          renderChatLogList();
+        });
+      } else {
+        el.querySelector('.edit-btn').addEventListener('click', () => {
+          editingCalorieId = entry.id;
+          renderChatLogList();
+        });
+        el.querySelector('.delete-btn').addEventListener('click', () => deleteCalorieEntry(entry.id));
+      }
+    });
+    list.appendChild(groupWrap);
   });
 }
 
@@ -1777,23 +1949,37 @@ function renderApiKeyStatus() {
 
 // ---------- AI assistant: chat ----------
 const CALORIE_TOOL = {
-  name: 'log_calories',
-  description: "Log an estimated calorie amount for food or drink the person says they've eaten or drunk. Call this whenever the message describes something consumed, even casually mentioned.",
+  name: 'log_food_items',
+  description: "Log the food or drink items the person says they've eaten or drunk, broken down as separate items with calories and macros for each. Call this whenever the message describes something consumed, even casually mentioned — break a whole meal into its distinct components rather than one lump entry.",
   input_schema: {
     type: 'object',
     properties: {
-      calories: { type: 'number', description: 'Best-estimate total calories for everything described in this message.' },
-      description: { type: 'string', description: 'Short (under 8 words) plain-text summary of what was logged, e.g. "Grilled chicken sandwich and fries".' }
+      items: {
+        type: 'array',
+        description: 'One entry per distinct food or drink item mentioned in the message.',
+        items: {
+          type: 'object',
+          properties: {
+            name: { type: 'string', description: 'Short name of the item, e.g. "Grilled chicken sandwich".' },
+            calories: { type: 'number', description: 'Best-estimate calories for this item alone.' },
+            protein: { type: 'number', description: 'Best-estimate grams of protein for this item.' },
+            carbs: { type: 'number', description: 'Best-estimate grams of carbohydrates for this item.' },
+            fat: { type: 'number', description: 'Best-estimate grams of fat for this item.' }
+          },
+          required: ['name', 'calories', 'protein', 'carbs', 'fat']
+        }
+      }
     },
-    required: ['calories', 'description']
+    required: ['items']
   }
 };
 
 const CHAT_SYSTEM_PROMPT = "You are a friendly nutrition assistant inside a personal health-tracking app called WeightMeGodun. " +
-  "When the person describes food or drink they've consumed, estimate the calories as best you can from general nutrition " +
-  "knowledge and call the log_calories tool with your best estimate — don't ask clarifying questions first, just give your " +
-  "best estimate and note any assumptions briefly in your reply. If the message isn't about food (a question, greeting, etc.), " +
-  "just reply conversationally without calling the tool. Keep replies brief, warm, and to the point — one or two sentences.";
+  "When the person describes food or drink they've consumed, break it down into its distinct items (e.g. \"burger and fries and a coke\" " +
+  "is three items, not one) and call the log_food_items tool with a best-estimate calorie and macro (protein/carbs/fat in grams) " +
+  "breakdown for each item, using general nutrition knowledge — don't ask clarifying questions first, just give your best estimate " +
+  "and note any assumptions briefly in your reply. If the message isn't about food (a question, greeting, etc.), just reply " +
+  "conversationally without calling the tool. Keep replies brief, warm, and to the point — one or two sentences.";
 
 async function fetchWithTimeout(url, options, ms) {
   const controller = new AbortController();
@@ -1820,7 +2006,14 @@ function renderChatWindow() {
       bubble.textContent = msg.text;
     } else if (msg.role === 'logged') {
       bubble.className = 'chat-bubble logged';
-      bubble.innerHTML = `<span>✓</span><span>Logged ${msg.calories} kcal — ${msg.description}</span>`;
+      const items = msg.items || [];
+      const breakdown = items.map(it =>
+        `<div class="chat-item-row"><span>${it.description}</span><span class="mono">${it.calories} kcal</span></div>`
+      ).join('');
+      bubble.innerHTML = `
+        <div class="chat-item-row" style="font-weight:800;"><span>✓ Logged ${msg.calories} kcal</span></div>
+        ${breakdown}
+      `;
     } else if (msg.role === 'error') {
       bubble.className = 'chat-bubble error';
       bubble.textContent = msg.text;
@@ -1911,14 +2104,17 @@ async function sendChatMessage(text) {
     const data = await res.json();
     const blocks = data.content || [];
     const textParts = blocks.filter(b => b.type === 'text').map(b => b.text).join(' ').trim();
-    const toolUse = blocks.find(b => b.type === 'tool_use' && b.name === 'log_calories');
+    const toolUse = blocks.find(b => b.type === 'tool_use' && b.name === 'log_food_items');
 
     if (textParts) {
       pushChatMessage({ role: 'assistant', text: textParts });
     }
-    if (toolUse && toolUse.input && typeof toolUse.input.calories === 'number') {
-      addCalorieEntry(todayStr(), toolUse.input.calories, toolUse.input.description || 'Logged item');
-      pushChatMessage({ role: 'logged', calories: Math.round(toolUse.input.calories), description: toolUse.input.description || 'Logged item' });
+
+    const items = toolUse && toolUse.input && Array.isArray(toolUse.input.items) ? toolUse.input.items : null;
+    if (items && items.length > 0) {
+      const logged = addCalorieItems(todayStr(), items);
+      const total = logged.reduce((sum, e) => sum + e.calories, 0);
+      pushChatMessage({ role: 'logged', calories: total, items: logged });
     } else if (!textParts) {
       pushChatMessage({ role: 'assistant', text: "Got it, but I didn't catch anything to log there." });
     }
@@ -2003,6 +2199,9 @@ function setupCalorieManualForm() {
   const dateInput = document.getElementById('calorie-date');
   const valueInput = document.getElementById('calorie-value');
   const descInput = document.getElementById('calorie-description');
+  const proteinInput = document.getElementById('calorie-protein');
+  const carbsInput = document.getElementById('calorie-carbs');
+  const fatInput = document.getElementById('calorie-fat');
   const submitBtn = document.getElementById('calorie-manual-submit-btn');
   const logDatePicker = document.getElementById('calorie-log-date');
 
@@ -2014,9 +2213,17 @@ function setupCalorieManualForm() {
       return;
     }
     const description = (descInput.value || '').trim() || 'Manual entry';
-    addCalorieEntry(date, calories, description);
+    const macros = {
+      protein: parseDecimal(proteinInput.value),
+      carbs: parseDecimal(carbsInput.value),
+      fat: parseDecimal(fatInput.value)
+    };
+    addCalorieEntry(date, calories, description, macros);
     valueInput.value = '';
     descInput.value = '';
+    proteinInput.value = '';
+    carbsInput.value = '';
+    fatInput.value = '';
     flashStatus('calorie-manual-status', '✓ Logged ' + Math.round(calories) + ' kcal on ' + fmtDate(date));
     // Jump the log browser to whatever date was just logged, so the entry is visible immediately.
     if (logDatePicker) {
@@ -2064,8 +2271,27 @@ function deleteMeasurement(id) {
   renderAll();
 }
 
-function addCalorieEntry(date, calories, description) {
-  const entry = { id: uid(), date, calories: Math.round(calories), description, loggedAt: new Date().toISOString() };
+function macroNum(v) {
+  const n = Number(v);
+  return isFinite(n) && n >= 0 ? Math.round(n * 10) / 10 : 0;
+}
+
+// Adds one food/drink item. `groupId` links items logged together in the
+// same action (one AI reply, or one manual submission) so they can be shown
+// as a single meal breakdown.
+function addCalorieEntry(date, calories, description, macros, groupId) {
+  macros = macros || {};
+  const entry = {
+    id: uid(),
+    groupId: groupId || uid(),
+    date,
+    calories: Math.round(calories),
+    protein: macroNum(macros.protein),
+    carbs: macroNum(macros.carbs),
+    fat: macroNum(macros.fat),
+    description,
+    loggedAt: new Date().toISOString()
+  };
   state.calories.push(entry);
   state.calories.sort((a, b) => a.date.localeCompare(b.date));
   saveJSON(STORE.calories, state.calories);
@@ -2075,8 +2301,61 @@ function addCalorieEntry(date, calories, description) {
   return entry;
 }
 
+// Logs several items at once (e.g. an AI reply describing a whole meal) as
+// one group, with a single re-render at the end instead of one per item.
+function addCalorieItems(date, items) {
+  const groupId = uid();
+  const entries = items.map(item => {
+    const entry = {
+      id: uid(),
+      groupId,
+      date,
+      calories: Math.round(Number(item.calories) || 0),
+      protein: macroNum(item.protein),
+      carbs: macroNum(item.carbs),
+      fat: macroNum(item.fat),
+      description: item.name || item.description || 'Logged item',
+      loggedAt: new Date().toISOString()
+    };
+    state.calories.push(entry);
+    return entry;
+  });
+  state.calories.sort((a, b) => a.date.localeCompare(b.date));
+  saveJSON(STORE.calories, state.calories);
+  renderCalorieToday();
+  renderChatLogList();
+  renderDataSummary();
+  return entries;
+}
+
+function editCalorieEntry(id, updates) {
+  const idx = state.calories.findIndex(c => c.id === id);
+  if (idx === -1) return;
+  const existing = state.calories[idx];
+  state.calories[idx] = {
+    ...existing,
+    description: (updates.description || '').trim() || existing.description,
+    calories: Math.round(Number(updates.calories)) || 0,
+    protein: macroNum(updates.protein),
+    carbs: macroNum(updates.carbs),
+    fat: macroNum(updates.fat)
+  };
+  saveJSON(STORE.calories, state.calories);
+  renderCalorieToday();
+  renderChatLogList();
+  renderDataSummary();
+}
+
 function deleteCalorieEntry(id) {
   state.calories = state.calories.filter(c => c.id !== id);
+  saveJSON(STORE.calories, state.calories);
+  renderCalorieToday();
+  renderChatLogList();
+  renderDataSummary();
+}
+
+function deleteCalorieGroup(groupId) {
+  state.calories = state.calories.filter(c => c.groupId !== groupId);
   saveJSON(STORE.calories, state.calories);
   renderCalorieToday();
   renderChatLogList();
@@ -2359,6 +2638,7 @@ function setupInstallButton() {
     btn.style.display = 'none';
   });
 }
+
 
 
 
