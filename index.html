@@ -1,0 +1,2372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>WeightMeGodun</title>
+
+
+<link rel="manifest" href="manifest.json" />
+<meta name="theme-color" content="#A29CF0" />
+<link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png" />
+<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png" />
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="default" />
+<meta name="apple-mobile-web-app-title" content="WeightMeGodun" />
+<meta name="mobile-web-app-capable" content="yes" />
+
+
+<style>
+
+
+
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap');
+
+:root{
+  --bg: #ECEEF8;
+  --surface: #FFFFFF;
+  --ink: #16182E;
+  --ink-soft: #6E7191;
+  --ink-faint: #A2A4BE;
+
+  --periwinkle: #A29CF0;
+  --periwinkle-soft: #EDECFC;
+  --coral: #F3A78E;
+  --coral-soft: #FBEAE4;
+  --coral-deep: #F0755C;
+  --peach: #F4C79B;
+  --peach-soft: #FCF1E1;
+  --teal: #8FE0D0;
+  --teal-soft: #E7FAF5;
+  --pink: #F6A9C8;
+  --pink-soft: #FCEAF1;
+  --yellow: #F3CB4A;
+  --yellow-soft: #FDF6E1;
+  --sage: #A9C48A;
+  --sage-soft: #EEF4E7;
+
+  --warn: #B5761E;
+  --danger: #E0654E;
+  --danger-soft: #FBE7E2;
+  --positive: #3C8E76;
+  --positive-soft: #E4F5EF;
+
+  --hero-start: #A29CF0;
+  --hero-end: #7D74E0;
+}
+
+/* ---------- Theme presets ---------- */
+/* Default :root above = "Vibrant". Additional presets override the same
+   variable names, so every component re-colors automatically. */
+
+html[data-theme="minimal"]{
+  --bg: #F6F7F5;
+  --surface: #FFFFFF;
+  --ink: #1E2420;
+  --ink-soft: #626E67;
+  --ink-faint: #9AA69F;
+
+  --periwinkle: #3F6C5E;
+  --periwinkle-soft: #E8EEEA;
+  --coral: #C9AA7E;
+  --coral-soft: #F5EEE2;
+  --coral-deep: #A6835A;
+  --peach: #D9C49A;
+  --peach-soft: #F7F1E4;
+  --teal: #5B7FA6;
+  --teal-soft: #EAF0F6;
+  --pink: #9C6B9E;
+  --pink-soft: #F3ECF4;
+  --yellow: #C99A3E;
+  --yellow-soft: #F5EEDF;
+  --sage: #6B8F71;
+  --sage-soft: #EDF2EC;
+
+  --warn: #A6752B;
+  --danger: #B5544A;
+}
+
+html[data-theme="minimal"]{
+  --hero-start: #4F7D6E;
+  --hero-end: #33544A;
+  --positive: #3F7A64;
+  --positive-soft: #E8F1EC;
+  --danger-soft: #F5E9E6;
+}
+
+html[data-theme="midnight"]{
+  --bg: #14162A;
+  --surface: #1D2040;
+  --ink: #F2F3FA;
+  --ink-soft: #A9ADD4;
+  --ink-faint: #6F739E;
+
+  --periwinkle: #8FE0D0;
+  --periwinkle-soft: #1F3A38;
+  --coral: #F0A08A;
+  --coral-soft: #3A2620;
+  --coral-deep: #E8795C;
+  --peach: #F0C48A;
+  --peach-soft: #3A2E1C;
+  --teal: #7FC9E0;
+  --teal-soft: #1C2E38;
+  --pink: #E8A0C4;
+  --pink-soft: #3A2430;
+  --yellow: #F0D06A;
+  --yellow-soft: #3A3018;
+  --sage: #A9D08A;
+  --sage-soft: #26301C;
+
+  --warn: #F0C46A;
+  --danger: #F0806A;
+}
+
+html[data-theme="midnight"]{
+  --hero-start: #3FA891;
+  --hero-end: #256B5C;
+  --positive: #6FD9B8;
+  --positive-soft: #1D3A32;
+  --danger-soft: #3A2620;
+}
+
+html[data-theme="sunset"]{
+  --bg: #F7F3EA;
+  --surface: #FFFFFF;
+  --ink: #2A211A;
+  --ink-soft: #7A6A57;
+  --ink-faint: #B0A28E;
+
+  --periwinkle: #BF5B3D;
+  --periwinkle-soft: #F5E4DC;
+  --coral: #E8998A;
+  --coral-soft: #FBEAE4;
+  --coral-deep: #D9724F;
+  --peach: #E8B87A;
+  --peach-soft: #FBF0DE;
+  --teal: #6FA592;
+  --teal-soft: #E7F1EC;
+  --pink: #D98FA8;
+  --pink-soft: #F8E9EE;
+  --yellow: #D9A73E;
+  --yellow-soft: #F7EDD8;
+  --sage: #8FAE6F;
+  --sage-soft: #EEF3E6;
+
+  --warn: #B5761E;
+  --danger: #C1543E;
+}
+
+html[data-theme="sunset"]{
+  --hero-start: #BF5B3D;
+  --hero-end: #8F3F27;
+  --positive: #4E8F6E;
+  --positive-soft: #E8F1EC;
+  --danger-soft: #F5E4DC;
+}
+
+body{
+  transition: background-color .25s ease, color .25s ease;
+}
+.card, .stat-card, .hero-card, .nav-card, .badge, .measure-tag, .legend-chip,
+.ghost-btn, .primary, input, select, nav.tabs, .topbar-icon, .avatar-circle{
+  transition: background-color .25s ease, color .25s ease, border-color .25s ease, box-shadow .25s ease;
+}
+
+*{ box-sizing: border-box; }
+html,body{ margin:0; padding:0; }
+
+body{
+  background: var(--bg);
+  color: var(--ink);
+  font-family: 'Inter', sans-serif;
+  min-height: 100vh;
+  padding: 0 0 110px;
+  -webkit-font-smoothing: antialiased;
+}
+
+.display{ font-family: 'Poppins', sans-serif; }
+
+/* ---------- Loading ---------- */
+#loading-screen{
+  position: fixed; inset:0; z-index:60;
+  display:flex; align-items:center; justify-content:center; flex-direction:column; gap:14px;
+  background: var(--bg);
+}
+.spinner{
+  width:26px; height:26px; border-radius:50%;
+  border: 3px solid var(--periwinkle-soft); border-top-color: var(--periwinkle);
+  animation: spin 0.8s linear infinite;
+}
+@media (prefers-reduced-motion: reduce){ .spinner{ animation-duration: 1.6s; } }
+@keyframes spin{ to{ transform: rotate(360deg); } }
+#loading-screen p{ font-family:'Inter', sans-serif; font-size: 13px; color: var(--ink-soft); }
+
+/* ---------- Confetti canvas ---------- */
+#confetti-canvas{ position: fixed; inset:0; z-index: 55; pointer-events:none; display:none; }
+
+/* ---------- Error banner ---------- */
+.error-banner{
+  display:none; position: fixed; top:0; left:0; right:0; z-index: 80;
+  background: var(--danger); color: #fff; text-align:center; padding: 10px 16px;
+  font-family:'Inter', sans-serif; font-size: 12.5px; font-weight: 500;
+}
+.error-banner.show{ display:block; }
+
+/* ---------- Level up toast ---------- */
+#level-up-toast{
+  position: fixed; top: -90px; left: 50%; transform: translateX(-50%);
+  z-index: 70; background: var(--ink); color: #fff;
+  padding: 14px 26px; border-radius: 999px;
+  box-shadow: 0 10px 28px rgba(22,24,46,0.28);
+  text-align: center; transition: top .45s cubic-bezier(.2,1.2,.4,1);
+  font-family: 'Inter', sans-serif; font-size: 13px; display:flex; align-items:center; gap:8px;
+}
+#level-up-toast.show{ top: 20px; }
+#level-up-toast .lu-level{ font-family:'Poppins', sans-serif; font-weight: 700; }
+
+/* ---------- Shell ---------- */
+.shell{ max-width: 460px; margin: 0 auto; padding: 20px 18px 0; }
+
+/* ---------- Top bar ---------- */
+.topbar{ display:flex; align-items:center; gap: 12px; margin-bottom: 18px; }
+.avatar-circle{
+  width: 42px; height: 42px; border-radius: 50%;
+  background: #fff; color: #fff; display:flex; align-items:center; justify-content:center;
+  font-family:'Poppins', sans-serif; font-weight: 700; font-size: 16px; flex-shrink: 0;
+  overflow: hidden; box-shadow: 0 2px 8px rgba(22,24,46,0.10);
+}
+.avatar-circle img{ width: 100%; height: 100%; object-fit: cover; }
+.topbar-greeting{ flex: 1; min-width: 0; }
+.topbar-greeting .hi{ font-size: 12px; color: var(--ink-soft); }
+.topbar-greeting .brand{ font-family:'Poppins', sans-serif; font-weight: 700; font-size: 17px; margin: 1px 0 0; }
+.topbar-icon{
+  width: 38px; height: 38px; border-radius: 50%; background: var(--surface);
+  display:flex; align-items:center; justify-content:center; font-size: 15px; color: var(--ink-soft);
+  box-shadow: 0 2px 8px rgba(22,24,46,0.06); flex-shrink: 0;
+  border: none; padding: 0; font-family: inherit; cursor: pointer;
+}
+
+/* ---------- Hero progress card ---------- */
+.hero-card{
+  background: linear-gradient(150deg, var(--hero-start) 0%, var(--hero-end) 100%);
+  border-radius: 26px; padding: 22px; color: #fff;
+  display:flex; align-items:center; gap: 18px; margin-bottom: 14px;
+  position: relative; overflow: hidden;
+}
+.hero-info{ flex: 1; min-width: 0; }
+.hero-label{ font-size: 12.5px; opacity: 0.85; margin: 0 0 6px; }
+.hero-level{ font-family:'Poppins', sans-serif; font-weight: 800; font-size: 26px; margin: 0 0 10px; }
+.hero-xp-track{ height: 7px; border-radius: 6px; background: rgba(255,255,255,0.28); overflow: hidden; }
+.hero-xp-fill{ height: 100%; background: #fff; border-radius: 6px; width: 0%; transition: width .4s ease; }
+.hero-xp-label{ font-size: 11.5px; opacity: 0.85; margin-top: 7px; display:block; }
+.hero-ring-wrap{ position: relative; width: 84px; height: 84px; flex-shrink: 0; }
+.hero-ring-wrap svg{ transform: rotate(-90deg); }
+.hero-ring-bg{ fill:none; stroke: rgba(255,255,255,0.28); stroke-width: 8; }
+.hero-ring-fg{ fill:none; stroke: #fff; stroke-width: 8; stroke-linecap: round; transition: stroke-dashoffset .5s ease; }
+.hero-ring-text{
+  position:absolute; inset:0; display:flex; align-items:center; justify-content:center; flex-direction: column;
+}
+.hero-ring-num{ font-family:'Poppins', sans-serif; font-weight: 800; font-size: 18px; line-height: 1; }
+.hero-ring-cap{ font-size: 9px; opacity: 0.85; margin-top: 2px; }
+
+.streak-pill{
+  position:absolute; top: 14px; right: 18px;
+  background: rgba(255,255,255,0.22); border-radius: 999px; padding: 5px 12px;
+  display:flex; align-items:center; gap: 5px; font-size: 12px; font-weight: 600;
+}
+.streak-flame{ font-size: 12px; opacity: 0.55; }
+.streak-flame.lit{ opacity: 1; }
+
+/* ---------- Nav card grid ---------- */
+.nav-grid{ display:grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px; }
+.nav-card{
+  border-radius: 22px; padding: 18px; cursor: pointer; border: none; text-align: left;
+  display:flex; flex-direction: column; gap: 26px; min-height: 128px; position: relative;
+  font-family: inherit;
+}
+.nav-card.coral{ background: var(--coral); }
+.nav-card.teal{ background: var(--teal); }
+.nav-icon{
+  width: 34px; height: 34px; border-radius: 50%; background: rgba(255,255,255,0.55);
+  display:flex; align-items:center; justify-content:center; font-size: 15px;
+}
+.nav-card-title{ font-family:'Poppins', sans-serif; font-weight: 700; font-size: 14.5px; color: var(--ink); margin: 0 0 3px; }
+.nav-card-sub{ font-size: 11.5px; color: rgba(22,24,46,0.6); margin: 0; }
+.nav-card-link{ font-size: 12px; font-weight: 600; color: var(--ink); display:flex; align-items:center; gap: 4px; margin-top: auto; }
+
+/* ---------- Cards ---------- */
+.card{
+  background: var(--surface); border-radius: 22px; padding: 20px;
+  box-shadow: 0 2px 14px rgba(22,24,46,0.05);
+}
+.card + .card{ margin-top: 14px; }
+.card-title{ font-family:'Poppins', sans-serif; font-weight: 700; font-size: 15px; margin: 0 0 4px; }
+.card-sub{ font-size: 12.5px; color: var(--ink-faint); margin: 0 0 16px; }
+
+/* ---------- Stat readout card ---------- */
+.stat-card{
+  background: var(--surface); border-radius: 22px; padding: 20px; margin-bottom: 14px;
+  box-shadow: 0 2px 14px rgba(22,24,46,0.05);
+  display:flex; align-items:center; gap: 16px;
+  font-family: inherit; transition: transform .1s ease;
+}
+button.stat-card:hover{ transform: translateY(-1px); }
+button.stat-card:active{ transform: translateY(0); }
+.stat-icon{
+  width: 46px; height: 46px; border-radius: 16px; background: var(--coral-soft);
+  display:flex; align-items:center; justify-content:center; font-size: 20px; flex-shrink: 0;
+}
+.stat-info{ flex: 1; min-width: 0; }
+.readout-label{ font-size: 12px; color: var(--ink-faint); margin: 0 0 4px; }
+.readout-value{ font-family:'Poppins', sans-serif; font-weight: 800; font-size: 24px; margin: 0; color: var(--ink); }
+.readout-secondary{ font-size: 12px; color: var(--ink-soft); margin-top: 4px; }
+.trend{ font-size: 12px; margin-top: 6px; font-weight: 600; }
+.trend.up{ color: var(--danger); }
+.trend.down{ color: var(--positive); }
+.trend.neutral{ color: var(--ink-faint); }
+
+canvas{ width: 100%; height: 200px; display:block; }
+
+/* ---------- Measure tags ---------- */
+.measure-tags{ display:flex; flex-wrap: wrap; gap: 8px; margin-top: 4px; }
+.measure-tag{
+  display:flex; align-items:center; gap:7px;
+  background: var(--bg); border-radius: 999px; padding: 7px 13px 7px 10px; font-size: 12.5px;
+}
+.tag-dot{ width: 8px; height: 8px; border-radius: 50%; background: var(--tag-color, var(--periwinkle)); flex-shrink: 0; }
+.tag-label{ font-size: 10.5px; text-transform: uppercase; color: var(--ink-faint); letter-spacing: 0.02em; font-weight: 600; }
+.tag-value{ font-weight: 700; }
+.tag-delta{ font-size: 10.5px; padding: 1px 7px; border-radius: 999px; font-weight: 600; }
+.tag-delta.up{ background: var(--danger-soft); color: var(--danger); }
+.tag-delta.down{ background: var(--positive-soft); color: var(--positive); }
+#measure-latest-date{ font-size: 11.5px; color: var(--ink-faint); margin-top: 12px; display:block; }
+
+/* ---------- Legend chips ---------- */
+.legend-row{ display:flex; flex-wrap:wrap; gap: 7px; margin-bottom: 14px; }
+.legend-chip{
+  font-family:'Inter', sans-serif; font-size: 12px; font-weight: 500;
+  border: none; background: var(--bg);
+  border-radius: 999px; padding: 6px 13px 6px 11px; cursor:pointer;
+  color: var(--ink-faint); display:flex; align-items:center; gap:6px; transition: all .12s ease;
+}
+.legend-chip::before{ content:''; width:7px; height:7px; border-radius:50%; background: var(--chip-color); opacity: 0.35; }
+.legend-chip.active{ color: #fff; background: var(--chip-color); }
+.legend-chip.active::before{ opacity: 1; background: #fff; }
+
+/* ---------- Achievements ---------- */
+.achievements-head{ display:flex; justify-content: space-between; align-items: baseline; margin-bottom: 14px; }
+#achievements-count{ font-size: 12px; color: var(--ink-faint); font-weight: 600; }
+.achievements-grid{ display:grid; grid-template-columns: repeat(auto-fill, minmax(140px,1fr)); gap: 10px; }
+.badge{
+  border-radius: 18px; padding: 14px 10px; text-align: center; opacity: 0.4; background: var(--bg);
+}
+.badge.unlocked{ opacity: 1; background: var(--yellow-soft); }
+.badge-icon{ font-size: 20px; margin-bottom: 8px; }
+.badge-name{ font-family:'Poppins', sans-serif; font-size: 11.5px; font-weight: 700; margin-bottom: 3px; }
+.badge-desc{ font-size: 10.5px; color: var(--ink-faint); line-height: 1.4; }
+
+/* ---------- Section header on log pages ---------- */
+.quest-head{ display:flex; justify-content: space-between; align-items: flex-start; gap: 10px; margin-bottom: 4px; }
+.quest-reward{
+  font-size: 11.5px; background: var(--yellow-soft); color: var(--warn);
+  padding: 5px 12px; border-radius: 999px; font-weight: 700; white-space: nowrap;
+}
+
+/* ---------- Forms ---------- */
+form.entry-form{ display:grid; gap: 14px; margin-top: 12px; }
+.field-row{ display:grid; grid-template-columns: repeat(auto-fit, minmax(130px,1fr)); gap: 10px; }
+label{ font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.03em; color: var(--ink-faint); display:block; margin-bottom: 6px; }
+input[type="date"], input[type="text"], input[type="number"], select{
+  width: 100%; font-family:'Inter', sans-serif; font-size: 14.5px; font-weight: 500; color: var(--ink);
+  background: var(--bg); border: none; border-radius: 14px;
+  padding: 12px 14px; outline: none; transition: box-shadow .12s ease;
+}
+input:focus, select:focus{ box-shadow: 0 0 0 2px var(--periwinkle); }
+input:focus-visible, select:focus-visible, button:focus-visible{ outline: 2px solid var(--periwinkle); outline-offset: 2px; }
+
+.measure-grid{ display:grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; }
+
+.btn-row{ display:flex; align-items:center; gap: 14px; margin-top: 4px; flex-wrap: wrap; }
+.primary{
+  font-family:'Inter', sans-serif; font-weight: 700; font-size: 14px;
+  background: var(--ink); color: #fff; border: none; border-radius: 999px;
+  padding: 13px 24px; cursor: pointer; transition: transform .1s ease, background .12s ease;
+  display:flex; align-items:center; gap: 8px; user-select: none;
+}
+.primary:hover{ background: var(--periwinkle); }
+.primary:active{ transform: scale(0.97); }
+.status-msg{ font-size: 12.5px; font-weight: 600; color: var(--positive); opacity:0; transition: opacity .2s ease; }
+.status-msg.show{ opacity: 1; }
+.status-msg.warning{ color: var(--warn); }
+.status-msg.error{ color: var(--danger); }
+
+/* ---------- History lists ---------- */
+.history-row{
+  display:flex; align-items:center; justify-content: space-between; gap: 10px;
+  padding: 12px 4px; border-bottom: 1px solid var(--bg);
+  font-size: 13.5px;
+}
+.history-row:last-child{ border-bottom: none; }
+.history-date{ font-size: 12.5px; color: var(--ink-soft); min-width: 96px; font-weight: 500; }
+.history-value{ font-weight: 700; flex: 1; text-align: left; padding-left: 10px; color: var(--ink); }
+.measure-row{ flex-direction: column; align-items: stretch; gap: 4px; }
+.measure-row-top{ display:flex; justify-content: space-between; align-items:center; }
+.measure-row-detail{ font-size: 12px; color: var(--ink-soft); }
+.icon-btn{
+  background: var(--bg); border: none; color: var(--ink-faint); cursor: pointer;
+  width: 26px; height: 26px; border-radius: 50%; font-size: 12px;
+  display:flex; align-items:center; justify-content:center;
+}
+.icon-btn:hover{ color: #fff; background: var(--danger); }
+.empty-note{ color: var(--ink-faint); font-size: 13px; padding: 8px 0; }
+
+/* ---------- Footer ---------- */
+.footer-row{ display:flex; justify-content: space-between; align-items:center; margin: 18px 4px 0; flex-wrap: wrap; gap: 10px; }
+.ghost-btn{
+  background: var(--surface); border: none; color: var(--ink-soft);
+  font-family:'Inter', sans-serif; font-size: 12px; font-weight: 600; border-radius: 999px;
+  padding: 9px 16px; cursor: pointer; box-shadow: 0 2px 8px rgba(22,24,46,0.06);
+}
+.ghost-btn:hover{ color: var(--danger); }
+.footnote{ font-size: 10.5px; color: var(--ink-faint); }
+
+/* ---------- Settings: secondary button ---------- */
+.secondary{
+  font-family:'Inter', sans-serif; font-weight: 700; font-size: 14px;
+  background: var(--bg); color: var(--ink); border: none; border-radius: 999px;
+  padding: 13px 24px; cursor: pointer; display:flex; align-items:center; gap: 8px;
+  user-select: none; transition: background-color .12s ease;
+}
+.secondary:hover{ background: var(--periwinkle-soft); }
+
+/* ---------- Settings: data summary ---------- */
+.data-summary{
+  display:flex; gap: 18px; margin-bottom: 16px; flex-wrap: wrap;
+}
+.data-summary-stat{ display:flex; flex-direction: column; gap: 2px; }
+.data-summary-num{ font-family:'Poppins', sans-serif; font-weight: 800; font-size: 20px; }
+.data-summary-label{ font-size: 11.5px; color: var(--ink-faint); }
+#import-file-input{
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0;
+}
+
+/* ---------- Settings: theme grid ---------- */
+.theme-grid{ display:grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px; }
+.theme-swatch{
+  border: none; border-radius: 16px; padding: 12px; cursor: pointer;
+  background: var(--bg); display:flex; flex-direction: column; gap: 10px; align-items: flex-start;
+  position: relative; box-shadow: 0 0 0 2px transparent; transition: box-shadow .15s ease;
+}
+.theme-swatch.active{ box-shadow: 0 0 0 2px var(--ink); }
+.swatch-preview{
+  width: 100%; height: 40px; border-radius: 10px; display:flex; align-items:flex-end; padding: 6px;
+  gap: 5px;
+}
+.swatch-dot{ width: 12px; height: 12px; border-radius: 50%; }
+.swatch-name{ font-family:'Inter', sans-serif; font-size: 12px; font-weight: 600; color: var(--ink); }
+.swatch-check{
+  position:absolute; top: 8px; right: 8px; width: 18px; height: 18px; border-radius: 50%;
+  background: var(--ink); color: var(--surface); font-size: 10px; display:none; align-items:center; justify-content:center;
+}
+.theme-swatch.active .swatch-check{ display:flex; }
+
+/* ---------- Bottom floating nav ---------- */
+nav.tabs{
+  position: fixed; bottom: 18px; left: 50%; transform: translateX(-50%);
+  z-index: 40; background: var(--ink); border-radius: 999px;
+  display:flex; gap: 2px; padding: 6px; box-shadow: 0 10px 30px rgba(22,24,46,0.3);
+  max-width: calc(100% - 24px); overflow-x: auto; -webkit-overflow-scrolling: touch;
+}
+nav.tabs::-webkit-scrollbar{ display:none; }
+.tab-btn{
+  font-family: 'Inter', sans-serif; font-weight: 600; font-size: 12.5px;
+  background: none; border: none; cursor: pointer; color: rgba(255,255,255,0.55);
+  padding: 11px 14px; border-radius: 999px; white-space: nowrap; flex-shrink: 0;
+}
+.tab-btn.active{ color: var(--ink); background: #fff; }
+
+main{ display: block; margin-top: 4px; }
+.panel{ display:none; }
+.panel.active{ display:block; }
+
+/* ---------- Settings: API key ---------- */
+.api-key-row{ display:flex; gap: 8px; flex-wrap: wrap; }
+.api-key-row input{ flex: 1; min-width: 160px; }
+.api-key-status{
+  display:flex; align-items:center; gap: 8px; margin-top: 10px; font-size: 12.5px; color: var(--ink-soft);
+}
+.api-key-status .dot{ width: 8px; height: 8px; border-radius: 50%; background: var(--ink-faint); }
+.api-key-status.set .dot{ background: var(--positive); }
+.warning-box{
+  background: var(--danger-soft); color: var(--warn); border-radius: 14px; padding: 12px 14px;
+  font-size: 12px; line-height: 1.5; margin-top: 14px;
+}
+
+/* ---------- Calorie stat + chat ---------- */
+.chat-header-row{ display:flex; justify-content: space-between; align-items:flex-start; margin-bottom: 4px; }
+.chat-total{ text-align: right; flex-shrink: 0; }
+.chat-total-num{ font-family:'Poppins', sans-serif; font-weight: 800; font-size: 22px; }
+.chat-total-label{ font-size: 11px; color: var(--ink-faint); }
+
+.chat-window{
+  display:flex; flex-direction: column; gap: 10px; max-height: 380px; overflow-y: auto;
+  padding: 4px 2px; margin: 14px 0;
+}
+.chat-empty{ color: var(--ink-faint); font-size: 13px; text-align:center; padding: 30px 10px; }
+.chat-bubble{
+  max-width: 82%; padding: 11px 15px; border-radius: 18px; font-size: 13.5px; line-height: 1.45;
+}
+.chat-bubble.user{
+  align-self: flex-end; background: var(--ink); color: #fff; border-bottom-right-radius: 5px;
+}
+.chat-bubble.assistant{
+  align-self: flex-start; background: var(--bg); color: var(--ink); border-bottom-left-radius: 5px;
+}
+.chat-bubble.error{
+  align-self: flex-start; background: var(--danger-soft); color: var(--danger); border-bottom-left-radius: 5px;
+}
+.chat-bubble.logged{
+  align-self: flex-start; background: var(--positive-soft); color: var(--positive);
+  font-weight: 600; border-radius: 18px; display:flex; align-items:center; gap: 7px;
+}
+.chat-bubble.pending{ align-self: flex-start; background: var(--bg); color: var(--ink-faint); }
+.typing-dots span{
+  display:inline-block; width: 5px; height: 5px; border-radius: 50%; background: var(--ink-faint);
+  margin-right: 3px; animation: typing 1s infinite ease-in-out;
+}
+.typing-dots span:nth-child(2){ animation-delay: .15s; }
+.typing-dots span:nth-child(3){ animation-delay: .3s; }
+@keyframes typing{ 0%,60%,100%{ opacity: .3; transform: translateY(0); } 30%{ opacity: 1; transform: translateY(-2px); } }
+
+.chat-input-row{ display:flex; gap: 8px; }
+.chat-input-row input{ flex: 1; }
+.chat-input-row button{ padding: 12px 18px; flex-shrink: 0; }
+
+.chat-log-list{ margin-top: 6px; }
+.no-key-note{
+  background: var(--bg); border-radius: 16px; padding: 20px; text-align:center; color: var(--ink-soft); font-size: 13px;
+}
+.no-key-note a, .no-key-note .link-btn{
+  color: var(--periwinkle); font-weight: 600; cursor: pointer; background:none; border:none; font-size: 13px; text-decoration: underline;
+}
+
+
+
+
+</style>
+</head>
+<body>
+
+
+
+
+
+<div id="loading-screen">
+  <div class="spinner"></div>
+  <p>Loading…</p>
+</div>
+
+<canvas id="confetti-canvas"></canvas>
+<div id="error-banner" class="error-banner"></div>
+<div id="level-up-toast">
+  <span>🎉 Level up —</span>
+  <span class="lu-level">Level <span id="level-up-number">2</span></span>
+</div>
+
+<div class="shell">
+
+  <div class="topbar">
+    <div class="avatar-circle"><img src="icons/icon-192.png" alt="WeightMeGodun" /></div>
+    <div class="topbar-greeting">
+      <p class="hi">Hello!</p>
+      <p class="brand">WeightMeGodun</p>
+    </div>
+    <div class="topbar-icon" aria-hidden="true">🔍</div>
+    <button type="button" class="topbar-icon" data-tab="settings" style="border:none;" aria-label="Settings">⚙️</button>
+  </div>
+
+  <div class="hero-card">
+    <div class="streak-pill">
+      <span class="streak-flame" id="streak-flame">🔥</span>
+      <span id="streak-count">0</span> day streak
+    </div>
+    <div class="hero-info">
+      <p class="hero-label">Your progress</p>
+      <p class="hero-level">Level <span id="level-number">1</span></p>
+      <div class="hero-xp-track"><div class="hero-xp-fill" id="xp-fill"></div></div>
+      <span class="hero-xp-label" id="xp-label">0 / 100 XP</span>
+    </div>
+    <div class="hero-ring-wrap">
+      <svg width="84" height="84" viewBox="0 0 84 84">
+        <circle class="hero-ring-bg" cx="42" cy="42" r="36"></circle>
+        <circle class="hero-ring-fg" id="hero-ring-fg" cx="42" cy="42" r="36" stroke-dasharray="226" stroke-dashoffset="226"></circle>
+      </svg>
+      <div class="hero-ring-text">
+        <span class="hero-ring-num" id="hero-ring-num">0%</span>
+        <span class="hero-ring-cap">XP</span>
+      </div>
+    </div>
+    <span id="avatar-emoji" style="display:none;"></span>
+  </div>
+
+  <div class="nav-grid">
+    <button type="button" class="nav-card coral" data-tab="weight">
+      <div class="nav-icon">⚖️</div>
+      <div>
+        <p class="nav-card-title">Log Weight</p>
+        <p class="nav-card-sub">Today's check-in</p>
+        <p class="nav-card-link">Log now →</p>
+      </div>
+    </button>
+    <button type="button" class="nav-card teal" data-tab="measure">
+      <div class="nav-icon">📏</div>
+      <div>
+        <p class="nav-card-title">Log Measurements</p>
+        <p class="nav-card-sub">Monthly check-in</p>
+        <p class="nav-card-link">Log now →</p>
+      </div>
+    </button>
+  </div>
+
+  <main>
+
+    <!-- ===================== DASHBOARD ===================== -->
+    <section id="panel-dashboard" class="panel active">
+
+      <div class="stat-card">
+        <div class="stat-icon">⚖️</div>
+        <div class="stat-info">
+          <p class="readout-label">7-day avg weight</p>
+          <p class="readout-value" id="avg-readout">—</p>
+          <p class="readout-secondary" id="latest-readout">—</p>
+          <p class="trend neutral" id="trend-readout"></p>
+        </div>
+      </div>
+
+      <button type="button" class="stat-card" data-tab="chat" style="width:100%; text-align:left; border:none; cursor:pointer;">
+        <div class="stat-icon" style="background:var(--peach-soft);">🍽️</div>
+        <div class="stat-info">
+          <p class="readout-label">Calories today</p>
+          <p class="readout-value" id="calorie-today-readout">—</p>
+          <p class="readout-secondary" id="calorie-today-secondary">Tap to log with AI chat →</p>
+        </div>
+      </button>
+
+      <div class="card">
+        <p class="card-title">Weight trend</p>
+        <p class="card-sub">Last 60 logged days</p>
+        <canvas id="weight-chart"></canvas>
+      </div>
+
+      <div class="card">
+        <p class="card-title">Latest measurements</p>
+        <p class="card-sub">Your most recent readings</p>
+        <div class="measure-tags" id="measure-latest"></div>
+        <span id="measure-latest-date"></span>
+      </div>
+
+      <div class="card">
+        <p class="card-title">Measurement trends</p>
+        <p class="card-sub">Select a measurement to show or hide it on the chart</p>
+        <div class="legend-row" id="measure-legend"></div>
+        <canvas id="measure-chart"></canvas>
+      </div>
+
+      <div class="card">
+        <div class="achievements-head">
+          <p class="card-title" style="margin:0;">Achievements</p>
+          <span id="achievements-count">0 / 8</span>
+        </div>
+        <div class="achievements-grid" id="achievements-grid"></div>
+      </div>
+
+      <div class="footer-row">
+        <span class="footnote">Saved in this browser only (localStorage) — no server, no account.</span>
+      </div>
+    </section>
+
+    <!-- ===================== LOG WEIGHT ===================== -->
+    <section id="panel-weight" class="panel">
+      <div class="card">
+        <div class="quest-head">
+          <div>
+            <p class="card-title">Today's weigh-in</p>
+            <p class="card-sub">Logging the same date twice overwrites it.</p>
+          </div>
+          <span class="quest-reward" id="quest-xp-weight">+10 XP</span>
+        </div>
+        <form class="entry-form" id="weight-form">
+          <div class="field-row">
+            <div>
+              <label for="weight-date">Date</label>
+              <input type="date" id="weight-date" />
+            </div>
+            <div>
+              <label for="weight-value">Weight</label>
+              <input type="text" id="weight-value" inputmode="decimal" placeholder="0.0" autocomplete="off" />
+            </div>
+            <div>
+              <label for="weight-unit-select">Unit</label>
+              <select id="weight-unit-select">
+                <option value="kg">kg</option>
+                <option value="lb">lb</option>
+              </select>
+            </div>
+          </div>
+          <div class="btn-row">
+            <button type="button" class="primary" id="weight-submit-btn">Save weigh-in →</button>
+            <span class="status-msg" id="weight-status"></span>
+          </div>
+        </form>
+      </div>
+
+      <div class="card">
+        <p class="card-title">History</p>
+        <div id="weight-history-list"></div>
+      </div>
+    </section>
+
+    <!-- ===================== LOG MEASUREMENTS ===================== -->
+    <section id="panel-measure" class="panel">
+      <div class="card">
+        <div class="quest-head">
+          <div>
+            <p class="card-title">Monthly measurements</p>
+            <p class="card-sub">Fill in whichever measurements you took — leave the rest blank.</p>
+          </div>
+          <span class="quest-reward" id="quest-xp-measure">+50 XP</span>
+        </div>
+        <form class="entry-form" id="measure-form">
+          <div class="field-row">
+            <div>
+              <label for="measure-date">Date</label>
+              <input type="date" id="measure-date" />
+            </div>
+            <div>
+              <label for="measure-unit-select">Unit</label>
+              <select id="measure-unit-select">
+                <option value="cm">cm</option>
+                <option value="in">in</option>
+              </select>
+            </div>
+          </div>
+          <div class="measure-grid">
+            <div><label for="m-waist">Waist</label><input type="text" inputmode="decimal" id="m-waist" placeholder="0.0" autocomplete="off" /></div>
+            <div><label for="m-hip">Hip</label><input type="text" inputmode="decimal" id="m-hip" placeholder="0.0" autocomplete="off" /></div>
+            <div><label for="m-upperArm">Upper arm</label><input type="text" inputmode="decimal" id="m-upperArm" placeholder="0.0" autocomplete="off" /></div>
+            <div><label for="m-wrist">Wrist</label><input type="text" inputmode="decimal" id="m-wrist" placeholder="0.0" autocomplete="off" /></div>
+            <div><label for="m-chest">Chest</label><input type="text" inputmode="decimal" id="m-chest" placeholder="0.0" autocomplete="off" /></div>
+            <div><label for="m-upperLeg">Upper leg</label><input type="text" inputmode="decimal" id="m-upperLeg" placeholder="0.0" autocomplete="off" /></div>
+            <div><label for="m-lowerLeg">Lower leg</label><input type="text" inputmode="decimal" id="m-lowerLeg" placeholder="0.0" autocomplete="off" /></div>
+          </div>
+          <div class="btn-row">
+            <button type="button" class="primary" id="measure-submit-btn">Save measurements →</button>
+            <span class="status-msg" id="measure-status"></span>
+          </div>
+        </form>
+      </div>
+
+      <div class="card">
+        <p class="card-title">History</p>
+        <div id="measure-history-list"></div>
+      </div>
+    </section>
+
+    <!-- ===================== AI CALORIE CHAT ===================== -->
+    <section id="panel-chat" class="panel">
+      <div class="card" id="chat-card">
+        <div class="chat-header-row">
+          <div>
+            <p class="card-title">Calorie chat</p>
+            <p class="card-sub" style="margin-bottom:0;">Tell it what you ate — it'll estimate calories and log them.</p>
+          </div>
+          <div class="chat-total">
+            <div class="chat-total-num" id="chat-today-total">0</div>
+            <div class="chat-total-label">kcal today</div>
+          </div>
+        </div>
+
+        <div id="chat-no-key" class="no-key-note" style="display:none; margin-top:14px;">
+          Add your Anthropic API key in <button type="button" class="link-btn" data-tab="settings">Settings</button> to start chatting.
+        </div>
+
+        <div id="chat-ui" style="display:none;">
+          <div class="chat-window" id="chat-window"></div>
+          <form class="chat-input-row" id="chat-form">
+            <input type="text" id="chat-input" placeholder="e.g. two eggs and toast with butter" autocomplete="off" />
+            <button type="button" class="primary" id="chat-send-btn">Send</button>
+          </form>
+        </div>
+      </div>
+
+      <div class="card">
+        <p class="card-title">Log calories manually</p>
+        <p class="card-sub">Add an entry yourself — no AI key needed. Pick any date, including past days.</p>
+        <form class="entry-form" id="calorie-manual-form">
+          <div class="field-row">
+            <div>
+              <label for="calorie-date">Date</label>
+              <input type="date" id="calorie-date" />
+            </div>
+            <div>
+              <label for="calorie-value">Calories</label>
+              <input type="text" id="calorie-value" inputmode="decimal" placeholder="e.g. 450" autocomplete="off" />
+            </div>
+            <div>
+              <label for="calorie-description">Note (optional)</label>
+              <input type="text" id="calorie-description" placeholder="e.g. Lunch" autocomplete="off" />
+            </div>
+          </div>
+          <div class="btn-row">
+            <button type="button" class="primary" id="calorie-manual-submit-btn">Log calories</button>
+            <span class="status-msg" id="calorie-manual-status"></span>
+          </div>
+        </form>
+      </div>
+
+      <div class="card">
+        <div class="chat-header-row">
+          <p class="card-title" style="margin:0;">Logged entries</p>
+          <input type="date" id="calorie-log-date" style="width:auto; max-width:150px;" />
+        </div>
+        <div id="chat-log-list" class="chat-log-list" style="margin-top:14px;"></div>
+      </div>
+    </section>
+
+    <!-- ===================== SETTINGS ===================== -->
+    <section id="panel-settings" class="panel">
+      <div class="card">
+        <p class="card-title">Backup &amp; restore</p>
+        <p class="card-sub">Save your data to a file, or restore it on another device.</p>
+        <div class="data-summary">
+          <div class="data-summary-stat">
+            <span class="data-summary-num" id="summary-weight-count">0</span>
+            <span class="data-summary-label">weigh-ins</span>
+          </div>
+          <div class="data-summary-stat">
+            <span class="data-summary-num" id="summary-measure-count">0</span>
+            <span class="data-summary-label">measurement sessions</span>
+          </div>
+          <div class="data-summary-stat">
+            <span class="data-summary-num" id="summary-calorie-count">0</span>
+            <span class="data-summary-label">calorie logs</span>
+          </div>
+        </div>
+        <div class="btn-row">
+          <button type="button" class="primary" id="export-data-btn">Export data ↓</button>
+          <label class="secondary" for="import-file-input">Import data ↑</label>
+          <input type="file" id="import-file-input" accept="application/json,.json" />
+        </div>
+        <span class="status-msg" id="data-status" style="margin-top:12px; display:block;"></span>
+      </div>
+
+      <div class="card">
+        <p class="card-title">Install app</p>
+        <p class="card-sub">Add WeightMeGodun to your home screen for a full-screen, app-like experience — works offline once installed.</p>
+        <button type="button" class="primary" id="install-app-btn" style="display:none;">Install app</button>
+      </div>
+
+      <div class="card">
+        <p class="card-title">AI assistant</p>
+        <p class="card-sub">Paste your Anthropic API key to enable the calorie chat.</p>
+        <div class="api-key-row">
+          <input type="password" id="api-key-input" placeholder="sk-ant-..." autocomplete="off" />
+          <button type="button" class="primary" id="api-key-save-btn">Save</button>
+          <button type="button" class="secondary" id="api-key-remove-btn">Remove</button>
+        </div>
+        <div class="api-key-status" id="api-key-status">
+          <span class="dot"></span>
+          <span id="api-key-status-text">No key saved</span>
+        </div>
+        <div class="warning-box">
+          Your key is stored only in this browser's local storage and is sent directly from your browser to Anthropic's API — never through any server of ours. Anyone with access to this browser could read it from developer tools. It's excluded from data exports, so it won't end up in a shared backup file. Remove it here any time.
+        </div>
+      </div>
+
+      <div class="card">
+        <p class="card-title">Theme</p>
+        <p class="card-sub">Pick a look for the app</p>
+        <div class="theme-grid" id="theme-grid"></div>
+      </div>
+
+      <div class="card">
+        <p class="card-title">Reset</p>
+        <p class="card-sub">Permanently clear all logged data from this browser. This can't be undone — export a backup first if you want to keep it.</p>
+        <button class="ghost-btn" id="reset-data-btn">Clear all data</button>
+      </div>
+
+      <div class="footer-row">
+        <span class="footnote">Saved in this browser only (localStorage) — no server, no account.</span>
+      </div>
+    </section>
+
+  </main>
+
+</div>
+
+<nav class="tabs">
+  <button class="tab-btn active" data-tab="dashboard">Overview</button>
+  <button class="tab-btn" data-tab="weight">Weight</button>
+  <button class="tab-btn" data-tab="measure">Measure</button>
+  <button class="tab-btn" data-tab="chat">Calories</button>
+  <button class="tab-btn" data-tab="settings">Settings</button>
+</nav>
+
+
+
+
+
+<script>
+
+
+
+
+
+
+
+// ---------- Storage helpers (browser localStorage) ----------
+const LS_PREFIX = 'weightmegodun:';
+const STORE = {
+  weight: 'weight-entries',
+  measure: 'measurement-entries',
+  settings: 'settings',
+  calories: 'calorie-entries',
+  chat: 'chat-history'
+};
+
+let localStorageAvailable = true;
+
+function checkLocalStorage() {
+  try {
+    const testKey = LS_PREFIX + '__test__';
+    localStorage.setItem(testKey, '1');
+    localStorage.removeItem(testKey);
+    return true;
+  } catch (e) {
+    return false;
+  }
+}
+
+function loadJSON(key, fallback) {
+  try {
+    const raw = localStorage.getItem(LS_PREFIX + key);
+    if (raw === null) return fallback;
+    return JSON.parse(raw);
+  } catch (e) {
+    console.error('localStorage read error', e);
+    return fallback;
+  }
+}
+
+function saveJSON(key, value) {
+  try {
+    localStorage.setItem(LS_PREFIX + key, JSON.stringify(value));
+    return true;
+  } catch (e) {
+    console.error('localStorage write error', e);
+    return false;
+  }
+}
+
+// ---------- State ----------
+let state = {
+  weights: [],
+  measurements: [],
+  calories: [],
+  chatHistory: [],
+  settings: { weightUnit: 'kg', measureUnit: 'cm', theme: 'vibrant', apiKey: '' },
+  loaded: false
+};
+let lastKnownLevel = 1;
+let chatBusy = false;
+
+const MEASURE_FIELDS = [
+  { key: 'waist', label: 'Waist' },
+  { key: 'hip', label: 'Hip' },
+  { key: 'upperArm', label: 'Upper Arm' },
+  { key: 'wrist', label: 'Wrist' },
+  { key: 'chest', label: 'Chest' },
+  { key: 'upperLeg', label: 'Upper Leg' },
+  { key: 'lowerLeg', label: 'Lower Leg' }
+];
+
+let MEASURE_COLORS = {
+  waist: '#F0755C',
+  hip: '#A29CF0',
+  upperArm: '#4FAE9A',
+  wrist: '#E091B8',
+  chest: '#E0A937',
+  upperLeg: '#7DAF5C',
+  lowerLeg: '#5B8FD4'
+};
+
+// ---------- Themes ----------
+const THEMES = [
+  {
+    id: 'vibrant',
+    name: 'Vibrant',
+    preview: { bg: '#ECEEF8', accent: '#A29CF0', surface: '#FFFFFF' },
+    measureColors: {
+      waist: '#F0755C', hip: '#A29CF0', upperArm: '#4FAE9A',
+      wrist: '#E091B8', chest: '#E0A937', upperLeg: '#7DAF5C', lowerLeg: '#5B8FD4'
+    }
+  },
+  {
+    id: 'minimal',
+    name: 'Minimal',
+    preview: { bg: '#F6F7F5', accent: '#3F6C5E', surface: '#FFFFFF' },
+    measureColors: {
+      waist: '#3F6C5E', hip: '#8A6A4F', upperArm: '#5B7FA6',
+      wrist: '#9C6B9E', chest: '#A6752B', upperLeg: '#6B8F71', lowerLeg: '#B5544A'
+    }
+  },
+  {
+    id: 'midnight',
+    name: 'Midnight',
+    preview: { bg: '#14162A', accent: '#8FE0D0', surface: '#1D2040' },
+    measureColors: {
+      waist: '#F0A08A', hip: '#8FE0D0', upperArm: '#7FC9E0',
+      wrist: '#E8A0C4', chest: '#F0D06A', upperLeg: '#A9D08A', lowerLeg: '#B8AEF0'
+    }
+  },
+  {
+    id: 'sunset',
+    name: 'Sunset',
+    preview: { bg: '#F7F3EA', accent: '#BF5B3D', surface: '#FFFFFF' },
+    measureColors: {
+      waist: '#BF5B3D', hip: '#6FA592', upperArm: '#D98FA8',
+      wrist: '#D9A73E', chest: '#8FAE6F', upperLeg: '#5B7FA6', lowerLeg: '#A6835A'
+    }
+  }
+];
+
+function cssVar(name) {
+  return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+}
+
+const ACHIEVEMENTS = [
+  { id: 'first-steps', icon: '🐣', name: 'First Steps', desc: 'Log your first weigh-in', test: s => s.weights.length >= 1 },
+  { id: 'cartographer', icon: '🗺️', name: 'Cartographer', desc: 'Log your first measurement set', test: s => s.measurements.length >= 1 },
+  { id: 'week-warrior', icon: '🔥', name: 'Week Warrior', desc: 'Reach a 7-day logging streak', test: (s, streak) => streak >= 7 },
+  { id: 'iron-streak', icon: '⚡', name: 'Iron Streak', desc: 'Reach a 30-day logging streak', test: (s, streak) => streak >= 30 },
+  { id: 'full-scan', icon: '🛡️', name: 'Full Body Scan', desc: 'Log all 7 measurements in one session', test: s => s.measurements.some(m => MEASURE_FIELDS.every(f => m[f.key] !== undefined && m[f.key] !== '')) },
+  { id: 'consistency-king', icon: '👑', name: 'Consistency King', desc: 'Log measurements 3 months in a row', test: s => s.measurements.length >= 3 },
+  { id: 'half-century', icon: '🥈', name: 'Half-Century', desc: 'Log 50 weigh-ins', test: s => s.weights.length >= 50 },
+  { id: 'centurion', icon: '🏆', name: 'Centurion', desc: 'Log 100 weigh-ins', test: s => s.weights.length >= 100 }
+];
+
+function uid() {
+  return Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+}
+// Accepts "73.2", "73,2", " 73.2 kg" etc. — anything with a recognizable number in it.
+function parseDecimal(raw) {
+  if (raw === undefined || raw === null) return NaN;
+  const cleaned = String(raw).trim().replace(',', '.').replace(/[^0-9.\-]/g, '');
+  if (cleaned === '' || cleaned === '-' || cleaned === '.') return NaN;
+  return parseFloat(cleaned);
+}
+function todayStr() {
+  return new Date().toISOString().slice(0, 10);
+}
+function fmtDate(dstr) {
+  const d = new Date(dstr + 'T00:00:00');
+  return d.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
+}
+function daysBetween(a, b) {
+  const d1 = new Date(a + 'T00:00:00');
+  const d2 = new Date(b + 'T00:00:00');
+  return Math.round((d2 - d1) / 86400000);
+}
+
+// ---------- Gamification math ----------
+function computeStreak() {
+  if (state.weights.length === 0) return 0;
+  const dateSet = new Set(state.weights.map(w => w.date));
+  let cursor = new Date();
+  let streak = 0;
+  // allow streak to still count if today not yet logged, start check from today, fall back to yesterday
+  let cursorStr = cursor.toISOString().slice(0, 10);
+  if (!dateSet.has(cursorStr)) {
+    cursor.setDate(cursor.getDate() - 1);
+    cursorStr = cursor.toISOString().slice(0, 10);
+    if (!dateSet.has(cursorStr)) return 0;
+  }
+  while (dateSet.has(cursorStr)) {
+    streak++;
+    cursor.setDate(cursor.getDate() - 1);
+    cursorStr = cursor.toISOString().slice(0, 10);
+  }
+  return streak;
+}
+
+function computeXP() {
+  return state.weights.length * 10 + state.measurements.length * 50;
+}
+
+function computeStats() {
+  const totalXP = computeXP();
+  const level = Math.floor(totalXP / 100) + 1;
+  const xpIntoLevel = totalXP % 100;
+  const streak = computeStreak();
+  const unlocked = ACHIEVEMENTS.filter(a => a.test(state, streak));
+  return { totalXP, level, xpIntoLevel, progressPct: xpIntoLevel, streak, unlocked };
+}
+
+function avatarForLevel(level) {
+  if (level >= 15) return '🏆';
+  if (level >= 10) return '🥇';
+  if (level >= 6) return '💪';
+  if (level >= 3) return '🏃';
+  return '🐣';
+}
+
+// ---------- Init ----------
+function init() {
+  const loadingScreen = document.getElementById('loading-screen');
+  try {
+    localStorageAvailable = checkLocalStorage();
+
+    state.weights = loadJSON(STORE.weight, []).sort((a, b) => a.date.localeCompare(b.date));
+    state.measurements = loadJSON(STORE.measure, []).sort((a, b) => a.date.localeCompare(b.date));
+    state.calories = loadJSON(STORE.calories, []).sort((a, b) => a.date.localeCompare(b.date));
+    state.chatHistory = loadJSON(STORE.chat, []);
+    state.settings = loadJSON(STORE.settings, { weightUnit: 'kg', measureUnit: 'cm', theme: 'vibrant', apiKey: '' });
+    if (!state.settings.theme) state.settings.theme = 'vibrant';
+    if (!state.settings.apiKey) state.settings.apiKey = '';
+    state.loaded = true;
+
+    document.getElementById('weight-date').value = todayStr();
+    document.getElementById('measure-date').value = todayStr();
+    document.getElementById('weight-unit-select').value = state.settings.weightUnit;
+    document.getElementById('measure-unit-select').value = state.settings.measureUnit;
+    document.getElementById('calorie-date').value = todayStr();
+    document.getElementById('calorie-log-date').value = todayStr();
+
+    lastKnownLevel = computeStats().level;
+    applyTheme(state.settings.theme, false);
+    renderThemeGrid();
+    renderApiKeyStatus();
+    renderChatWindow();
+    renderAll();
+
+    if (!localStorageAvailable) {
+      const banner = document.getElementById('error-banner');
+      if (banner) {
+        banner.textContent = '⚠ This browser is blocking local storage here, so entries will only last for this session. Open the downloaded file directly in your browser to save permanently.';
+        banner.classList.add('show');
+      }
+    }
+  } catch (err) {
+    console.error('WeightMeGodun load error:', err);
+    document.getElementById('weight-date').value = todayStr();
+    document.getElementById('measure-date').value = todayStr();
+    const banner = document.getElementById('error-banner');
+    if (banner) {
+      banner.textContent = '⚠ Could not load saved data — starting fresh.';
+      banner.classList.add('show');
+    }
+    renderAll();
+  } finally {
+    loadingScreen.style.display = 'none';
+    loadingScreen.style.pointerEvents = 'none';
+  }
+}
+
+// ---------- Rendering ----------
+function renderAll() {
+  renderHud();
+  renderDashboard();
+  renderAchievements();
+  renderWeightHistory();
+  renderMeasureHistory();
+  renderDataSummary();
+  renderCalorieToday();
+  renderChatLogList();
+}
+
+function renderHud() {
+  const stats = computeStats();
+  document.getElementById('avatar-emoji').textContent = avatarForLevel(stats.level);
+  document.getElementById('level-number').textContent = stats.level;
+  document.getElementById('xp-fill').style.width = stats.progressPct + '%';
+  document.getElementById('xp-label').textContent = stats.xpIntoLevel + ' / 100 XP';
+  const streakEl = document.getElementById('streak-count');
+  streakEl.textContent = stats.streak;
+  document.getElementById('streak-flame').classList.toggle('lit', stats.streak > 0);
+  document.getElementById('quest-xp-weight').textContent = '+10 XP';
+  document.getElementById('quest-xp-measure').textContent = '+50 XP';
+
+  const ring = document.getElementById('hero-ring-fg');
+  if (ring) {
+    const circumference = 226; // 2 * PI * r(36), rounded
+    const offset = circumference - (circumference * stats.progressPct) / 100;
+    ring.style.strokeDashoffset = offset;
+  }
+  const ringNum = document.getElementById('hero-ring-num');
+  if (ringNum) ringNum.textContent = stats.progressPct + '%';
+}
+
+function last7Avg() {
+  if (state.weights.length === 0) return null;
+  const sorted = [...state.weights].sort((a, b) => b.date.localeCompare(a.date));
+  const last7 = sorted.slice(0, 7);
+  const sum = last7.reduce((s, w) => s + Number(w.value), 0);
+  return { avg: sum / last7.length, count: last7.length };
+}
+
+function prev7Avg() {
+  const sorted = [...state.weights].sort((a, b) => b.date.localeCompare(a.date));
+  const prev7 = sorted.slice(7, 14);
+  if (prev7.length === 0) return null;
+  const sum = prev7.reduce((s, w) => s + Number(w.value), 0);
+  return sum / prev7.length;
+}
+
+function renderDashboard() {
+  const avgEl = document.getElementById('avg-readout');
+  const latestEl = document.getElementById('latest-readout');
+  const trendEl = document.getElementById('trend-readout');
+  const unit = state.settings.weightUnit;
+
+  const cur = last7Avg();
+  if (!cur) {
+    avgEl.textContent = '—';
+    latestEl.textContent = '—';
+    trendEl.textContent = 'Start your first quest to begin tracking';
+    trendEl.className = 'trend neutral';
+  } else {
+    avgEl.textContent = cur.avg.toFixed(1) + ' ' + unit;
+    const sorted = [...state.weights].sort((a, b) => b.date.localeCompare(a.date));
+    latestEl.textContent = Number(sorted[0].value).toFixed(1) + ' ' + unit + ' · ' + fmtDate(sorted[0].date);
+
+    const prev = prev7Avg();
+    if (prev !== null) {
+      const diff = cur.avg - prev;
+      const arrow = diff > 0.05 ? '▲' : diff < -0.05 ? '▼' : '■';
+      const cls = diff > 0.05 ? 'up' : diff < -0.05 ? 'down' : 'neutral';
+      trendEl.textContent = arrow + ' ' + Math.abs(diff).toFixed(1) + ' ' + unit + ' vs prior 7-day avg';
+      trendEl.className = 'trend ' + cls;
+    } else {
+      trendEl.textContent = 'Based on ' + cur.count + ' day' + (cur.count === 1 ? '' : 's') + ' logged';
+      trendEl.className = 'trend neutral';
+    }
+  }
+
+  drawWeightChart();
+  renderMeasureLatest();
+  drawMeasureChart();
+}
+
+function renderMeasureLatest() {
+  const wrap = document.getElementById('measure-latest');
+  wrap.innerHTML = '';
+  if (state.measurements.length === 0) {
+    wrap.innerHTML = '<p class="empty-note">No measurements logged yet — start the Calibration quest.</p>';
+    document.getElementById('measure-latest-date').textContent = '';
+    return;
+  }
+  const sorted = [...state.measurements].sort((a, b) => b.date.localeCompare(a.date));
+  const latest = sorted[0];
+  const prior = sorted[1];
+  const unit = latest.unit || state.settings.measureUnit;
+
+  MEASURE_FIELDS.forEach(f => {
+    const val = latest[f.key];
+    if (val === undefined || val === '' || val === null) return;
+    const row = document.createElement('div');
+    row.className = 'measure-tag';
+    row.style.setProperty('--tag-color', MEASURE_COLORS[f.key]);
+    let deltaHtml = '';
+    if (prior && prior[f.key] !== undefined && prior[f.key] !== '') {
+      const d = Number(val) - Number(prior[f.key]);
+      if (Math.abs(d) >= 0.05) {
+        const sign = d > 0 ? '+' : '';
+        deltaHtml = `<span class="tag-delta ${d > 0 ? 'up' : 'down'}">${sign}${d.toFixed(1)}</span>`;
+      }
+    }
+    row.innerHTML = `<span class="tag-dot"></span><span class="tag-label">${f.label}</span><span class="tag-value">${Number(val).toFixed(1)} ${unit}</span>${deltaHtml}`;
+    wrap.appendChild(row);
+  });
+  document.getElementById('measure-latest-date').textContent = 'As of ' + fmtDate(latest.date);
+}
+
+function renderAchievements() {
+  const wrap = document.getElementById('achievements-grid');
+  wrap.innerHTML = '';
+  const stats = computeStats();
+  const unlockedIds = new Set(stats.unlocked.map(a => a.id));
+  ACHIEVEMENTS.forEach(a => {
+    const unlocked = unlockedIds.has(a.id);
+    const card = document.createElement('div');
+    card.className = 'badge' + (unlocked ? ' unlocked' : '');
+    card.innerHTML = `
+      <div class="badge-icon">${unlocked ? a.icon : '🔒'}</div>
+      <div class="badge-name">${a.name}</div>
+      <div class="badge-desc">${a.desc}</div>
+    `;
+    wrap.appendChild(card);
+  });
+  document.getElementById('achievements-count').textContent = stats.unlocked.length + ' / ' + ACHIEVEMENTS.length;
+}
+
+// ---------- Charts ----------
+function drawWeightChart() {
+  const canvas = document.getElementById('weight-chart');
+  const ctx = canvas.getContext('2d');
+  const dpr = window.devicePixelRatio || 1;
+  const rect = canvas.getBoundingClientRect();
+  canvas.width = rect.width * dpr;
+  canvas.height = rect.height * dpr;
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  ctx.clearRect(0, 0, rect.width, rect.height);
+
+  const data = [...state.weights].sort((a, b) => a.date.localeCompare(b.date)).slice(-60);
+  if (data.length < 2) {
+    ctx.fillStyle = cssVar('--ink-faint');
+    ctx.font = '12px "IBM Plex Mono", monospace';
+    ctx.fillText(data.length === 0 ? 'No entries yet — begin your quest!' : 'Log one more day to reveal the path', 16, 24);
+    return;
+  }
+
+  const padL = 44, padR = 16, padT = 16, padB = 26;
+  const w = rect.width - padL - padR;
+  const h = rect.height - padT - padB;
+  const values = data.map(d => Number(d.value));
+  let min = Math.min(...values), max = Math.max(...values);
+  if (min === max) { min -= 1; max += 1; }
+  const pad = (max - min) * 0.12;
+  min -= pad; max += pad;
+
+  ctx.strokeStyle = 'rgba(128,128,140,0.12)';
+  ctx.fillStyle = cssVar('--ink-faint');
+  ctx.font = '11px "IBM Plex Mono", monospace';
+  const ySteps = 4;
+  for (let i = 0; i <= ySteps; i++) {
+    const yVal = min + ((max - min) * i) / ySteps;
+    const y = padT + h - (h * i) / ySteps;
+    ctx.beginPath();
+    ctx.moveTo(padL, y);
+    ctx.lineTo(padL + w, y);
+    ctx.stroke();
+    ctx.fillText(yVal.toFixed(1), 4, y + 4);
+  }
+
+  ctx.strokeStyle = cssVar('--periwinkle');
+  ctx.lineWidth = 2.5;
+  ctx.beginPath();
+  data.forEach((d, i) => {
+    const x = padL + (w * i) / (data.length - 1);
+    const y = padT + h - (h * (Number(d.value) - min)) / (max - min);
+    if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+  });
+  ctx.stroke();
+
+  ctx.fillStyle = '#3F6C5E';
+  data.forEach((d, i) => {
+    const x = padL + (w * i) / (data.length - 1);
+    const y = padT + h - (h * (Number(d.value) - min)) / (max - min);
+    ctx.beginPath();
+    ctx.arc(x, y, 2.4, 0, Math.PI * 2);
+    ctx.fill();
+  });
+
+  // marker at latest point
+  const lastI = data.length - 1;
+  const lastX = padL + w;
+  const lastY = padT + h - (h * (Number(data[lastI].value) - min)) / (max - min);
+  ctx.beginPath();
+  ctx.arc(lastX, lastY, 3.5, 0, Math.PI * 2);
+  ctx.fillStyle = cssVar('--periwinkle');
+  ctx.fill();
+
+  ctx.fillStyle = cssVar('--ink-faint');
+  const labelIdxs = [0, Math.floor((data.length - 1) / 2), data.length - 1];
+  labelIdxs.forEach(i => {
+    const x = padL + (w * i) / (data.length - 1);
+    ctx.fillText(fmtDate(data[i].date).replace(/, \d{4}/, ''), Math.max(padL, x - 24), rect.height - 6);
+  });
+}
+
+let activeMeasureKeys = new Set(MEASURE_FIELDS.map(f => f.key));
+
+function drawMeasureChart() {
+  const canvas = document.getElementById('measure-chart');
+  const ctx = canvas.getContext('2d');
+  const dpr = window.devicePixelRatio || 1;
+  const rect = canvas.getBoundingClientRect();
+  canvas.width = rect.width * dpr;
+  canvas.height = rect.height * dpr;
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  ctx.clearRect(0, 0, rect.width, rect.height);
+
+  const data = [...state.measurements].sort((a, b) => a.date.localeCompare(b.date));
+  const keys = MEASURE_FIELDS.filter(f => activeMeasureKeys.has(f.key)).map(f => f.key);
+
+  if (data.length < 2 || keys.length === 0) {
+    ctx.fillStyle = cssVar('--ink-faint');
+    ctx.font = '12px "IBM Plex Mono", monospace';
+    ctx.fillText(data.length < 2 ? 'Log two calibrations to chart progress' : 'Select at least one stat', 16, 24);
+    return;
+  }
+
+  const padL = 44, padR = 16, padT = 16, padB = 26;
+  const w = rect.width - padL - padR;
+  const h = rect.height - padT - padB;
+
+  let allVals = [];
+  data.forEach(d => keys.forEach(k => { if (d[k] !== undefined && d[k] !== '') allVals.push(Number(d[k])); }));
+  if (allVals.length === 0) return;
+  let min = Math.min(...allVals), max = Math.max(...allVals);
+  if (min === max) { min -= 1; max += 1; }
+  const pad = (max - min) * 0.12;
+  min -= pad; max += pad;
+
+  ctx.strokeStyle = 'rgba(128,128,140,0.12)';
+  ctx.fillStyle = cssVar('--ink-faint');
+  ctx.font = '11px "IBM Plex Mono", monospace';
+  const ySteps = 4;
+  for (let i = 0; i <= ySteps; i++) {
+    const yVal = min + ((max - min) * i) / ySteps;
+    const y = padT + h - (h * i) / ySteps;
+    ctx.beginPath();
+    ctx.moveTo(padL, y);
+    ctx.lineTo(padL + w, y);
+    ctx.stroke();
+    ctx.fillText(yVal.toFixed(0), 4, y + 4);
+  }
+
+  keys.forEach(key => {
+    const points = data.map((d, i) => ({ i, val: d[key] })).filter(p => p.val !== undefined && p.val !== '');
+    if (points.length < 2) return;
+    ctx.strokeStyle = MEASURE_COLORS[key];
+    ctx.lineWidth = 2.2;
+    ctx.beginPath();
+    points.forEach((p, idx) => {
+      const x = padL + (w * p.i) / (data.length - 1);
+      const y = padT + h - (h * (Number(p.val) - min)) / (max - min);
+      if (idx === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+    });
+    ctx.stroke();
+    ctx.fillStyle = MEASURE_COLORS[key];
+    points.forEach(p => {
+      const x = padL + (w * p.i) / (data.length - 1);
+      const y = padT + h - (h * (Number(p.val) - min)) / (max - min);
+      ctx.beginPath();
+      ctx.arc(x, y, 2.4, 0, Math.PI * 2);
+      ctx.fill();
+    });
+  });
+
+  ctx.fillStyle = cssVar('--ink-faint');
+  const labelIdxs = [0, Math.floor((data.length - 1) / 2), data.length - 1];
+  labelIdxs.forEach(i => {
+    const x = padL + (w * i) / (data.length - 1);
+    ctx.fillText(fmtDate(data[i].date).replace(/, \d{4}/, ''), Math.max(padL, x - 24), rect.height - 6);
+  });
+}
+
+function renderMeasureLegend() {
+  const wrap = document.getElementById('measure-legend');
+  wrap.innerHTML = '';
+  MEASURE_FIELDS.forEach(f => {
+    const chip = document.createElement('button');
+    chip.type = 'button';
+    chip.className = 'legend-chip' + (activeMeasureKeys.has(f.key) ? ' active' : '');
+    chip.style.setProperty('--chip-color', MEASURE_COLORS[f.key]);
+    chip.textContent = f.label;
+    chip.addEventListener('click', () => {
+      if (activeMeasureKeys.has(f.key)) activeMeasureKeys.delete(f.key);
+      else activeMeasureKeys.add(f.key);
+      renderMeasureLegend();
+      drawMeasureChart();
+    });
+    wrap.appendChild(chip);
+  });
+}
+
+// ---------- History lists ----------
+function renderWeightHistory() {
+  const list = document.getElementById('weight-history-list');
+  list.innerHTML = '';
+  const sorted = [...state.weights].sort((a, b) => b.date.localeCompare(a.date));
+  if (sorted.length === 0) {
+    list.innerHTML = '<p class="empty-note">No weigh-ins logged yet.</p>';
+    return;
+  }
+  sorted.forEach(entry => {
+    const row = document.createElement('div');
+    row.className = 'history-row';
+    row.innerHTML = `
+      <span class="history-date">${fmtDate(entry.date)}</span>
+      <span class="history-value">${Number(entry.value).toFixed(1)} ${entry.unit}</span>
+      <button class="icon-btn delete-btn" data-id="${entry.id}" aria-label="Delete entry">✕</button>
+    `;
+    row.querySelector('.delete-btn').addEventListener('click', () => deleteWeight(entry.id));
+    list.appendChild(row);
+  });
+}
+
+function renderMeasureHistory() {
+  const list = document.getElementById('measure-history-list');
+  list.innerHTML = '';
+  const sorted = [...state.measurements].sort((a, b) => b.date.localeCompare(a.date));
+  if (sorted.length === 0) {
+    list.innerHTML = '<p class="empty-note">No measurements logged yet.</p>';
+    return;
+  }
+  sorted.forEach(entry => {
+    const row = document.createElement('div');
+    row.className = 'history-row measure-row';
+    const parts = MEASURE_FIELDS
+      .filter(f => entry[f.key] !== undefined && entry[f.key] !== '')
+      .map(f => `${f.label} ${Number(entry[f.key]).toFixed(1)}`)
+      .join(' · ');
+    row.innerHTML = `
+      <div class="measure-row-top">
+        <span class="history-date">${fmtDate(entry.date)}</span>
+        <button class="icon-btn delete-btn" data-id="${entry.id}" aria-label="Delete entry">✕</button>
+      </div>
+      <span class="measure-row-detail">${parts || '—'} (${entry.unit})</span>
+    `;
+    row.querySelector('.delete-btn').addEventListener('click', () => deleteMeasurement(entry.id));
+    list.appendChild(row);
+  });
+}
+
+// ---------- Settings: theme ----------
+function applyTheme(themeId, persist) {
+  const theme = THEMES.find(t => t.id === themeId) || THEMES[0];
+  document.documentElement.setAttribute('data-theme', theme.id);
+  MEASURE_COLORS = Object.assign({}, theme.measureColors);
+
+  if (persist) {
+    state.settings.theme = theme.id;
+    saveJSON(STORE.settings, state.settings);
+  }
+
+  document.querySelectorAll('.theme-swatch').forEach(el => {
+    el.classList.toggle('active', el.dataset.theme === theme.id);
+  });
+
+  // Re-render anything that reads colors (charts, measurement tags/legend)
+  if (state.loaded) {
+    renderMeasureLatest();
+    renderMeasureLegend();
+    drawWeightChart();
+    drawMeasureChart();
+  }
+}
+
+function renderThemeGrid() {
+  const wrap = document.getElementById('theme-grid');
+  if (!wrap) return;
+  wrap.innerHTML = '';
+  const activeId = state.settings.theme || 'vibrant';
+  THEMES.forEach(theme => {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'theme-swatch' + (theme.id === activeId ? ' active' : '');
+    btn.dataset.theme = theme.id;
+    btn.innerHTML = `
+      <span class="swatch-check">✓</span>
+      <span class="swatch-preview" style="background:${theme.preview.bg};">
+        <span class="swatch-dot" style="background:${theme.preview.accent};"></span>
+        <span class="swatch-dot" style="background:${theme.preview.surface};"></span>
+      </span>
+      <span class="swatch-name">${theme.name}</span>
+    `;
+    btn.addEventListener('click', () => applyTheme(theme.id, true));
+    wrap.appendChild(btn);
+  });
+}
+
+// ---------- Settings: backup & restore ----------
+function renderDataSummary() {
+  const weightEl = document.getElementById('summary-weight-count');
+  const measureEl = document.getElementById('summary-measure-count');
+  const calorieEl = document.getElementById('summary-calorie-count');
+  if (weightEl) weightEl.textContent = state.weights.length;
+  if (measureEl) measureEl.textContent = state.measurements.length;
+  if (calorieEl) calorieEl.textContent = state.calories.length;
+}
+
+function exportData() {
+  try {
+    const { apiKey, ...safeSettings } = state.settings;
+    const payload = {
+      app: 'WeightMeGodun',
+      version: 2,
+      exportedAt: new Date().toISOString(),
+      weights: state.weights,
+      measurements: state.measurements,
+      calories: state.calories,
+      settings: safeSettings
+    };
+    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    const stamp = todayStr();
+    a.href = url;
+    a.download = `weightmegodun-backup-${stamp}.json`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+    flashStatus('data-status', '✓ Backup downloaded (API key not included)');
+  } catch (err) {
+    console.error('Export error:', err);
+    flashStatus('data-status', '⚠ Could not export — try again', true);
+  }
+}
+
+function isValidEntryArray(arr, requiredKeys) {
+  return Array.isArray(arr) && arr.every(item =>
+    item && typeof item === 'object' && typeof item.date === 'string' &&
+    requiredKeys.every(k => k in item)
+  );
+}
+
+function importDataFromFile(file) {
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    let parsed;
+    try {
+      parsed = JSON.parse(reader.result);
+    } catch (err) {
+      flashStatus('data-status', '⚠ That file isn\'t valid JSON', true);
+      return;
+    }
+
+    const weights = parsed.weights;
+    const measurements = parsed.measurements;
+    const calories = parsed.calories || [];
+    const weightsOk = isValidEntryArray(weights, ['value', 'unit']);
+    const measurementsOk = isValidEntryArray(measurements, ['unit']);
+    const caloriesOk = isValidEntryArray(calories, ['calories']);
+
+    if (!weightsOk || !measurementsOk || !caloriesOk) {
+      flashStatus('data-status', '⚠ This file doesn\'t look like a WeightMeGodun backup', true);
+      return;
+    }
+
+    const hasExisting = state.weights.length > 0 || state.measurements.length > 0 || state.calories.length > 0;
+    if (hasExisting) {
+      const proceed = confirm(
+        `This will replace your current data (${state.weights.length} weigh-ins, ${state.measurements.length} measurement sessions, ${state.calories.length} calorie logs) ` +
+        `with the backup (${weights.length} weigh-ins, ${measurements.length} measurement sessions, ${calories.length} calorie logs). Continue?`
+      );
+      if (!proceed) return;
+    }
+
+    const currentApiKey = state.settings.apiKey || '';
+    state.weights = weights.map(w => ({ ...w, id: w.id || uid() })).sort((a, b) => a.date.localeCompare(b.date));
+    state.measurements = measurements.map(m => ({ ...m, id: m.id || uid() })).sort((a, b) => a.date.localeCompare(b.date));
+    state.calories = calories.map(c => ({ ...c, id: c.id || uid() })).sort((a, b) => a.date.localeCompare(b.date));
+    if (parsed.settings && typeof parsed.settings === 'object') {
+      state.settings = Object.assign({ weightUnit: 'kg', measureUnit: 'cm', theme: 'vibrant' }, parsed.settings);
+    }
+    // Backups never contain the API key (it's stripped on export) — keep whatever
+    // key is already saved in this browser rather than wiping it on import.
+    state.settings.apiKey = currentApiKey;
+
+    const wOk = saveJSON(STORE.weight, state.weights);
+    const mOk = saveJSON(STORE.measure, state.measurements);
+    const cOk = saveJSON(STORE.calories, state.calories);
+    saveJSON(STORE.settings, state.settings);
+
+    document.getElementById('weight-unit-select').value = state.settings.weightUnit;
+    document.getElementById('measure-unit-select').value = state.settings.measureUnit;
+    applyTheme(state.settings.theme, false);
+    renderThemeGrid();
+    lastKnownLevel = computeStats().level;
+    renderAll();
+
+    if (wOk && mOk && cOk) {
+      flashStatus('data-status', `✓ Restored ${weights.length} weigh-ins, ${measurements.length} measurement sessions, ${calories.length} calorie logs`);
+    } else {
+      flashStatus('data-status', '⚠ Restored for this session, but local storage may not save it', true);
+    }
+  };
+  reader.onerror = () => {
+    flashStatus('data-status', '⚠ Could not read that file', true);
+  };
+  reader.readAsText(file);
+}
+
+// ---------- Calories: dashboard + log rendering ----------
+function todaysCalorieEntries() {
+  const today = todayStr();
+  return state.calories.filter(c => c.date === today);
+}
+
+function selectedLogDate() {
+  const picker = document.getElementById('calorie-log-date');
+  return (picker && picker.value) || todayStr();
+}
+
+function calorieEntriesForDate(date) {
+  return state.calories.filter(c => c.date === date);
+}
+
+function renderCalorieToday() {
+  const readout = document.getElementById('calorie-today-readout');
+  const secondary = document.getElementById('calorie-today-secondary');
+  const totalEl = document.getElementById('chat-today-total');
+  if (!readout) return;
+  const todays = todaysCalorieEntries();
+  const total = todays.reduce((sum, c) => sum + Number(c.calories), 0);
+  readout.textContent = total > 0 ? total + ' kcal' : '—';
+  secondary.textContent = todays.length > 0
+    ? todays.length + ' item' + (todays.length === 1 ? '' : 's') + ' logged today'
+    : 'Tap to log with AI chat →';
+  if (totalEl) totalEl.textContent = total;
+}
+
+function renderChatLogList() {
+  const list = document.getElementById('chat-log-list');
+  if (!list) return;
+  list.innerHTML = '';
+  const date = selectedLogDate();
+  const entries = [...calorieEntriesForDate(date)].sort((a, b) => (b.loggedAt || '').localeCompare(a.loggedAt || ''));
+  if (entries.length === 0) {
+    list.innerHTML = '<p class="empty-note">Nothing logged on ' + fmtDate(date) + '.</p>';
+    return;
+  }
+  const total = entries.reduce((sum, c) => sum + Number(c.calories), 0);
+  const totalRow = document.createElement('div');
+  totalRow.className = 'history-row';
+  totalRow.style.borderBottom = 'none';
+  totalRow.innerHTML = `<span class="history-value" style="font-weight:700;">Total</span><span class="mono" style="font-weight:800;">${total} kcal</span>`;
+  list.appendChild(totalRow);
+  entries.forEach(entry => {
+    const row = document.createElement('div');
+    row.className = 'history-row';
+    row.innerHTML = `
+      <span class="history-value">${entry.description}</span>
+      <span class="mono" style="font-weight:700; margin-right:4px;">${entry.calories} kcal</span>
+      <button class="icon-btn delete-btn" data-id="${entry.id}" aria-label="Delete entry">✕</button>
+    `;
+    row.querySelector('.delete-btn').addEventListener('click', () => deleteCalorieEntry(entry.id));
+    list.appendChild(row);
+  });
+}
+
+// ---------- AI assistant: API key ----------
+function maskKey(key) {
+  if (!key || key.length < 8) return '••••••••';
+  return key.slice(0, 7) + '…' + key.slice(-4);
+}
+
+function renderApiKeyStatus() {
+  const statusWrap = document.getElementById('api-key-status');
+  const statusText = document.getElementById('api-key-status-text');
+  const hasKey = !!state.settings.apiKey;
+  if (statusWrap) statusWrap.classList.toggle('set', hasKey);
+  if (statusText) statusText.textContent = hasKey ? 'Key saved — ' + maskKey(state.settings.apiKey) : 'No key saved';
+
+  const noKeyNote = document.getElementById('chat-no-key');
+  const chatUi = document.getElementById('chat-ui');
+  if (noKeyNote && chatUi) {
+    noKeyNote.style.display = hasKey ? 'none' : 'block';
+    chatUi.style.display = hasKey ? 'block' : 'none';
+  }
+}
+
+// ---------- AI assistant: chat ----------
+const CALORIE_TOOL = {
+  name: 'log_calories',
+  description: "Log an estimated calorie amount for food or drink the person says they've eaten or drunk. Call this whenever the message describes something consumed, even casually mentioned.",
+  input_schema: {
+    type: 'object',
+    properties: {
+      calories: { type: 'number', description: 'Best-estimate total calories for everything described in this message.' },
+      description: { type: 'string', description: 'Short (under 8 words) plain-text summary of what was logged, e.g. "Grilled chicken sandwich and fries".' }
+    },
+    required: ['calories', 'description']
+  }
+};
+
+const CHAT_SYSTEM_PROMPT = "You are a friendly nutrition assistant inside a personal health-tracking app called WeightMeGodun. " +
+  "When the person describes food or drink they've consumed, estimate the calories as best you can from general nutrition " +
+  "knowledge and call the log_calories tool with your best estimate — don't ask clarifying questions first, just give your " +
+  "best estimate and note any assumptions briefly in your reply. If the message isn't about food (a question, greeting, etc.), " +
+  "just reply conversationally without calling the tool. Keep replies brief, warm, and to the point — one or two sentences.";
+
+async function fetchWithTimeout(url, options, ms) {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), ms);
+  try {
+    return await fetch(url, { ...options, signal: controller.signal });
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+function renderChatWindow() {
+  const win = document.getElementById('chat-window');
+  if (!win) return;
+  win.innerHTML = '';
+  if (state.chatHistory.length === 0) {
+    win.innerHTML = '<p class="chat-empty">Tell it what you ate today and it\'ll estimate the calories and log them for you.</p>';
+    return;
+  }
+  state.chatHistory.forEach(msg => {
+    const bubble = document.createElement('div');
+    if (msg.role === 'user') {
+      bubble.className = 'chat-bubble user';
+      bubble.textContent = msg.text;
+    } else if (msg.role === 'logged') {
+      bubble.className = 'chat-bubble logged';
+      bubble.innerHTML = `<span>✓</span><span>Logged ${msg.calories} kcal — ${msg.description}</span>`;
+    } else if (msg.role === 'error') {
+      bubble.className = 'chat-bubble error';
+      bubble.textContent = msg.text;
+    } else {
+      bubble.className = 'chat-bubble assistant';
+      bubble.textContent = msg.text;
+    }
+    win.appendChild(bubble);
+  });
+  win.scrollTop = win.scrollHeight;
+}
+
+function pushChatMessage(msg) {
+  state.chatHistory.push(msg);
+  if (state.chatHistory.length > 60) state.chatHistory = state.chatHistory.slice(-60);
+  saveJSON(STORE.chat, state.chatHistory);
+  renderChatWindow();
+}
+
+function setChatBusy(busy) {
+  chatBusy = busy;
+  const sendBtn = document.getElementById('chat-send-btn');
+  const input = document.getElementById('chat-input');
+  if (sendBtn) sendBtn.disabled = busy;
+  if (input) input.disabled = busy;
+  const win = document.getElementById('chat-window');
+  if (!win) return;
+  let pending = document.getElementById('chat-pending-bubble');
+  if (busy) {
+    if (!pending) {
+      pending = document.createElement('div');
+      pending.id = 'chat-pending-bubble';
+      pending.className = 'chat-bubble pending';
+      pending.innerHTML = '<span class="typing-dots"><span></span><span></span><span></span></span>';
+      win.appendChild(pending);
+      win.scrollTop = win.scrollHeight;
+    }
+  } else if (pending) {
+    pending.remove();
+  }
+}
+
+async function sendChatMessage(text) {
+  const apiKey = state.settings.apiKey;
+  if (!apiKey) return;
+  if (!text.trim() || chatBusy) return;
+
+  pushChatMessage({ role: 'user', text });
+  setChatBusy(true);
+
+  // Build the conversation the API expects from recent history (text turns only).
+  const history = state.chatHistory
+    .filter(m => m.role === 'user' || m.role === 'assistant')
+    .slice(-16)
+    .map(m => ({ role: m.role, content: m.text }));
+
+  try {
+    const res = await fetchWithTimeout('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json',
+        'x-api-key': apiKey,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
+      body: JSON.stringify({
+        model: 'claude-haiku-4-5-20251001',
+        max_tokens: 400,
+        system: CHAT_SYSTEM_PROMPT,
+        messages: history,
+        tools: [CALORIE_TOOL]
+      })
+    }, 30000);
+
+    if (!res.ok) {
+      let detail = '';
+      try { const errBody = await res.json(); detail = errBody?.error?.message || ''; } catch (e) {}
+      if (res.status === 401) {
+        pushChatMessage({ role: 'error', text: '⚠ That API key was rejected. Double-check it in Settings.' });
+      } else if (res.status === 429) {
+        pushChatMessage({ role: 'error', text: '⚠ Rate limited — wait a moment and try again.' });
+      } else {
+        pushChatMessage({ role: 'error', text: '⚠ Request failed (' + res.status + ')' + (detail ? ': ' + detail : '') });
+      }
+      return;
+    }
+
+    const data = await res.json();
+    const blocks = data.content || [];
+    const textParts = blocks.filter(b => b.type === 'text').map(b => b.text).join(' ').trim();
+    const toolUse = blocks.find(b => b.type === 'tool_use' && b.name === 'log_calories');
+
+    if (textParts) {
+      pushChatMessage({ role: 'assistant', text: textParts });
+    }
+    if (toolUse && toolUse.input && typeof toolUse.input.calories === 'number') {
+      addCalorieEntry(todayStr(), toolUse.input.calories, toolUse.input.description || 'Logged item');
+      pushChatMessage({ role: 'logged', calories: Math.round(toolUse.input.calories), description: toolUse.input.description || 'Logged item' });
+    } else if (!textParts) {
+      pushChatMessage({ role: 'assistant', text: "Got it, but I didn't catch anything to log there." });
+    }
+  } catch (err) {
+    console.error('Chat request error:', err);
+    if (err && err.name === 'AbortError') {
+      pushChatMessage({ role: 'error', text: '⚠ Request timed out — check your connection and try again.' });
+    } else {
+      pushChatMessage({ role: 'error', text: '⚠ Could not reach Anthropic\'s API. This can happen if your network or browser blocks direct API calls.' });
+    }
+  } finally {
+    setChatBusy(false);
+  }
+}
+
+function setupSettings() {
+  const exportBtn = document.getElementById('export-data-btn');
+  if (exportBtn) exportBtn.addEventListener('click', exportData);
+
+  const fileInput = document.getElementById('import-file-input');
+  if (fileInput) {
+    fileInput.addEventListener('change', () => {
+      const file = fileInput.files && fileInput.files[0];
+      importDataFromFile(file);
+      fileInput.value = '';
+    });
+  }
+
+  const apiKeyInput = document.getElementById('api-key-input');
+  const saveKeyBtn = document.getElementById('api-key-save-btn');
+  const removeKeyBtn = document.getElementById('api-key-remove-btn');
+
+  if (saveKeyBtn) {
+    saveKeyBtn.addEventListener('click', () => {
+      const value = (apiKeyInput.value || '').trim();
+      if (!value) return;
+      state.settings.apiKey = value;
+      saveJSON(STORE.settings, state.settings);
+      apiKeyInput.value = '';
+      renderApiKeyStatus();
+    });
+  }
+
+  if (removeKeyBtn) {
+    removeKeyBtn.addEventListener('click', () => {
+      if (!state.settings.apiKey) return;
+      if (!confirm('Remove the saved API key from this browser?')) return;
+      state.settings.apiKey = '';
+      saveJSON(STORE.settings, state.settings);
+      if (apiKeyInput) apiKeyInput.value = '';
+      renderApiKeyStatus();
+    });
+  }
+
+  const chatInput = document.getElementById('chat-input');
+  const chatSendBtn = document.getElementById('chat-send-btn');
+  const chatForm = document.getElementById('chat-form');
+
+  function submitChat() {
+    if (!chatInput) return;
+    const text = chatInput.value;
+    if (!text.trim() || chatBusy) return;
+    chatInput.value = '';
+    sendChatMessage(text);
+  }
+
+  if (chatSendBtn) chatSendBtn.addEventListener('click', submitChat);
+  if (chatInput) {
+    chatInput.addEventListener('keydown', e => {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        submitChat();
+      }
+    });
+  }
+  // Forms have no real submit button (type="button" only), but guard against
+  // native submission anyway in case a browser still fires it on Enter.
+  if (chatForm) chatForm.addEventListener('submit', e => { e.preventDefault(); submitChat(); });
+}
+
+function setupCalorieManualForm() {
+  const dateInput = document.getElementById('calorie-date');
+  const valueInput = document.getElementById('calorie-value');
+  const descInput = document.getElementById('calorie-description');
+  const submitBtn = document.getElementById('calorie-manual-submit-btn');
+  const logDatePicker = document.getElementById('calorie-log-date');
+
+  function submitManual() {
+    const date = (dateInput.value || todayStr());
+    const calories = parseDecimal(valueInput.value);
+    if (isNaN(calories) || calories <= 0) {
+      flashStatus('calorie-manual-status', '⚠ Enter a calorie amount to log this entry', true);
+      return;
+    }
+    const description = (descInput.value || '').trim() || 'Manual entry';
+    addCalorieEntry(date, calories, description);
+    valueInput.value = '';
+    descInput.value = '';
+    flashStatus('calorie-manual-status', '✓ Logged ' + Math.round(calories) + ' kcal on ' + fmtDate(date));
+    // Jump the log browser to whatever date was just logged, so the entry is visible immediately.
+    if (logDatePicker) {
+      logDatePicker.value = date;
+      renderChatLogList();
+    }
+  }
+
+  if (submitBtn) submitBtn.addEventListener('click', submitManual);
+  const manualForm = document.getElementById('calorie-manual-form');
+  if (manualForm) manualForm.addEventListener('submit', e => { e.preventDefault(); submitManual(); });
+  if (logDatePicker) {
+    logDatePicker.addEventListener('change', () => renderChatLogList());
+  }
+}
+
+// ---------- CRUD ----------
+function addWeight(date, value, unit) {
+  const existingIdx = state.weights.findIndex(w => w.date === date);
+  const entry = { id: existingIdx >= 0 ? state.weights[existingIdx].id : uid(), date, value, unit };
+  if (existingIdx >= 0) state.weights[existingIdx] = entry;
+  else state.weights.push(entry);
+  const ok = saveJSON(STORE.weight, state.weights);
+  afterSave(ok, 'weight-status');
+}
+
+function deleteWeight(id) {
+  state.weights = state.weights.filter(w => w.id !== id);
+  saveJSON(STORE.weight, state.weights);
+  renderAll();
+}
+
+function addMeasurement(date, unit, values) {
+  const existingIdx = state.measurements.findIndex(m => m.date === date);
+  const entry = { id: existingIdx >= 0 ? state.measurements[existingIdx].id : uid(), date, unit, ...values };
+  if (existingIdx >= 0) state.measurements[existingIdx] = entry;
+  else state.measurements.push(entry);
+  const ok = saveJSON(STORE.measure, state.measurements);
+  afterSave(ok, 'measure-status');
+}
+
+function deleteMeasurement(id) {
+  state.measurements = state.measurements.filter(m => m.id !== id);
+  saveJSON(STORE.measure, state.measurements);
+  renderAll();
+}
+
+function addCalorieEntry(date, calories, description) {
+  const entry = { id: uid(), date, calories: Math.round(calories), description, loggedAt: new Date().toISOString() };
+  state.calories.push(entry);
+  state.calories.sort((a, b) => a.date.localeCompare(b.date));
+  saveJSON(STORE.calories, state.calories);
+  renderCalorieToday();
+  renderChatLogList();
+  renderDataSummary();
+  return entry;
+}
+
+function deleteCalorieEntry(id) {
+  state.calories = state.calories.filter(c => c.id !== id);
+  saveJSON(STORE.calories, state.calories);
+  renderCalorieToday();
+  renderChatLogList();
+  renderDataSummary();
+}
+
+function afterSave(saveOk, statusElId) {
+  const stats = computeStats();
+  renderAll();
+  if (stats.level > lastKnownLevel) {
+    showLevelUp(stats.level);
+  }
+  lastKnownLevel = stats.level;
+  if (statusElId) {
+    if (saveOk) {
+      const xp = statusElId === 'weight-status' ? '+10 XP' : '+50 XP';
+      flashStatus(statusElId, '✓ Saved — ' + xp);
+    } else {
+      flashStatus(statusElId, '⚠ Saved for this session only — local storage is unavailable here', true);
+    }
+  }
+}
+
+// ---------- Tabs ----------
+function setupTabs() {
+  const bottomTabs = document.querySelectorAll('.tab-btn');
+  const tabTriggers = document.querySelectorAll('[data-tab]');
+
+  function goToTab(tabName) {
+    const panel = document.getElementById('panel-' + tabName);
+    if (!panel) return;
+    bottomTabs.forEach(b => b.classList.toggle('active', b.dataset.tab === tabName));
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    panel.classList.add('active');
+    if (tabName === 'dashboard') { drawWeightChart(); drawMeasureChart(); }
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  tabTriggers.forEach(el => el.addEventListener('click', () => goToTab(el.dataset.tab)));
+}
+
+// ---------- Level up + confetti ----------
+function showLevelUp(level) {
+  const toast = document.getElementById('level-up-toast');
+  document.getElementById('level-up-number').textContent = level;
+  toast.classList.add('show');
+  fireConfetti();
+  clearTimeout(toast._t);
+  toast._t = setTimeout(() => toast.classList.remove('show'), 2600);
+}
+
+function fireConfetti() {
+  const canvas = document.getElementById('confetti-canvas');
+  const ctx = canvas.getContext('2d');
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  canvas.style.display = 'block';
+  const colors = [
+    cssVar('--periwinkle'), cssVar('--coral'), cssVar('--teal'),
+    cssVar('--pink'), cssVar('--yellow')
+  ];
+  const particles = Array.from({ length: 80 }, () => ({
+    x: Math.random() * canvas.width,
+    y: -20 - Math.random() * 100,
+    size: 4 + Math.random() * 5,
+    color: colors[Math.floor(Math.random() * colors.length)],
+    vy: 2 + Math.random() * 3,
+    vx: -1.5 + Math.random() * 3,
+    rot: Math.random() * 360,
+    vrot: -6 + Math.random() * 12
+  }));
+  let frame = 0;
+  function step() {
+    frame++;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    particles.forEach(p => {
+      p.x += p.vx; p.y += p.vy; p.rot += p.vrot;
+      ctx.save();
+      ctx.translate(p.x, p.y);
+      ctx.rotate((p.rot * Math.PI) / 180);
+      ctx.fillStyle = p.color;
+      ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size);
+      ctx.restore();
+    });
+    if (frame < 110) {
+      requestAnimationFrame(step);
+    } else {
+      canvas.style.display = 'none';
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
+  }
+  requestAnimationFrame(step);
+}
+
+// ---------- Form wiring ----------
+function setupForms() {
+  function submitWeight() {
+    const date = document.getElementById('weight-date').value || todayStr();
+    const value = parseDecimal(document.getElementById('weight-value').value);
+    const unit = document.getElementById('weight-unit-select').value;
+    if (isNaN(value) || value <= 0) {
+      flashStatus('weight-status', '⚠ Enter a weight to save this entry', true);
+      return;
+    }
+    state.settings.weightUnit = unit;
+    saveJSON(STORE.settings, state.settings);
+    addWeight(date, value, unit);
+    document.getElementById('weight-value').value = '';
+  }
+
+  function submitMeasurement() {
+    const date = document.getElementById('measure-date').value || todayStr();
+    const unit = document.getElementById('measure-unit-select').value;
+    const values = {};
+    let anyFilled = false;
+    MEASURE_FIELDS.forEach(f => {
+      const raw = document.getElementById('m-' + f.key).value;
+      if (raw !== '') { const parsed = parseDecimal(raw); if (!isNaN(parsed)) { values[f.key] = parsed; anyFilled = true; } }
+    });
+    if (!anyFilled) {
+      flashStatus('measure-status', '⚠ Enter at least one measurement to save', true);
+      return;
+    }
+    state.settings.measureUnit = unit;
+    saveJSON(STORE.settings, state.settings);
+    addMeasurement(date, unit, values);
+    MEASURE_FIELDS.forEach(f => { document.getElementById('m-' + f.key).value = ''; });
+  }
+
+  // Buttons are type="button" (not "submit") and forms have no action —
+  // this deliberately avoids native form submission, which some sandboxed
+  // preview frames silently block with no error at all.
+  document.getElementById('weight-submit-btn').addEventListener('click', submitWeight);
+  document.getElementById('measure-submit-btn').addEventListener('click', submitMeasurement);
+
+  // Still prevent stray native form submits (e.g. pressing Enter) from
+  // reloading the page, and route Enter to the same submit logic.
+  document.getElementById('weight-form').addEventListener('submit', e => { e.preventDefault(); submitWeight(); });
+  document.getElementById('measure-form').addEventListener('submit', e => { e.preventDefault(); submitMeasurement(); });
+
+  document.getElementById('reset-data-btn').addEventListener('click', () => {
+    if (!confirm('This clears all logged weight, measurement, and calorie data plus chat history on this device (your saved API key is kept). Continue?')) return;
+    state.weights = [];
+    state.measurements = [];
+    state.calories = [];
+    state.chatHistory = [];
+    lastKnownLevel = 1;
+    saveJSON(STORE.weight, []);
+    saveJSON(STORE.measure, []);
+    saveJSON(STORE.calories, []);
+    saveJSON(STORE.chat, []);
+    renderChatWindow();
+    renderAll();
+  });
+}
+
+function flashStatus(id, msg, isWarning) {
+  const el = document.getElementById(id);
+  el.textContent = msg;
+  el.classList.toggle('warning', !!isWarning);
+  el.classList.add('show');
+  clearTimeout(el._t);
+  el._t = setTimeout(() => el.classList.remove('show'), 2400);
+}
+
+window.addEventListener('resize', () => { drawWeightChart(); drawMeasureChart(); });
+
+window.addEventListener('error', e => {
+  console.error('WeightMeGodun error:', e.error || e.message);
+  const banner = document.getElementById('error-banner');
+  if (banner) {
+    banner.textContent = '⚠ Something went wrong — try reloading. (' + (e.message || 'unknown error') + ')';
+    banner.classList.add('show');
+  }
+});
+
+window.addEventListener('unhandledrejection', e => {
+  console.error('WeightMeGodun unhandled rejection:', e.reason);
+  const banner = document.getElementById('error-banner');
+  if (banner) {
+    banner.textContent = '⚠ Something went wrong saving your data — try again.';
+    banner.classList.add('show');
+  }
+  const loadingScreen = document.getElementById('loading-screen');
+  if (loadingScreen) {
+    loadingScreen.style.display = 'none';
+    loadingScreen.style.pointerEvents = 'none';
+  }
+});
+
+function safeCall(fn, label) {
+  try {
+    fn();
+  } catch (err) {
+    console.error('WeightMeGodun: ' + label + ' failed to set up', err);
+  }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  safeCall(setupTabs, 'tabs');
+  safeCall(setupForms, 'forms');
+  safeCall(setupSettings, 'settings');
+  safeCall(setupCalorieManualForm, 'calorie manual form');
+  safeCall(setupInstallButton, 'install button');
+  safeCall(renderMeasureLegend, 'measure legend');
+
+  // init() loads your actual data and renders the app — this one we do want
+  // to know about loudly if it fails, since without it the app is unusable.
+  try {
+    init();
+  } catch (err) {
+    console.error('WeightMeGodun init error:', err);
+    const banner = document.getElementById('error-banner');
+    if (banner) {
+      banner.textContent = '⚠ Something went wrong loading the app — try reloading.';
+      banner.classList.add('show');
+    }
+  }
+});
+
+// ---------- PWA: service worker + install prompt ----------
+// Registering the service worker only works when this file is served over
+// http(s) (or localhost) — browsers block service workers on file:// pages.
+// That's expected there, so we fail silently rather than showing an error.
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js').catch(() => {
+      // Most commonly: opened as a local file, or not served over https.
+      // Not an error worth surfacing to the person using the app.
+    });
+  });
+}
+
+let deferredInstallPrompt = null;
+
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();
+  deferredInstallPrompt = e;
+  const btn = document.getElementById('install-app-btn');
+  if (btn) btn.style.display = 'inline-flex';
+});
+
+window.addEventListener('appinstalled', () => {
+  deferredInstallPrompt = null;
+  const btn = document.getElementById('install-app-btn');
+  if (btn) btn.style.display = 'none';
+  flashStatus('data-status', '✓ App installed');
+});
+
+function setupInstallButton() {
+  const btn = document.getElementById('install-app-btn');
+  if (!btn) return;
+
+  // iOS Safari never fires beforeinstallprompt — show manual instructions instead.
+  const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+  const isStandalone = (typeof window.matchMedia === 'function' && window.matchMedia('(display-mode: standalone)').matches)
+    || window.navigator.standalone === true;
+
+  if (isStandalone) {
+    btn.style.display = 'none';
+    return;
+  }
+  if (isIOS) {
+    btn.style.display = 'inline-flex';
+    btn.textContent = 'How to install';
+    btn.addEventListener('click', () => {
+      alert('On iPhone/iPad: tap the Share button in Safari, then "Add to Home Screen".');
+    });
+    return;
+  }
+
+  btn.addEventListener('click', async () => {
+    if (!deferredInstallPrompt) {
+      alert("Your browser hasn't offered an install prompt yet. Try reloading the page, or check your browser's menu for an \"Install app\" or \"Add to Home Screen\" option.");
+      return;
+    }
+    deferredInstallPrompt.prompt();
+    await deferredInstallPrompt.userChoice;
+    deferredInstallPrompt = null;
+    btn.style.display = 'none';
+  });
+}
+
+
+
+
+
+
+
+
+</script>
+</body>
+</html>
