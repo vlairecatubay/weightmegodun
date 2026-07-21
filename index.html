@@ -7,6 +7,7 @@
 
 
 
+
 <link rel="manifest" href="manifest.json" />
 <meta name="theme-color" content="#A29CF0" />
 <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png" />
@@ -19,7 +20,9 @@
 
 
 
+
 <style>
+
 
 
 
@@ -583,9 +586,11 @@ main{ display: block; margin-top: 4px; }
 
 
 
+
 </style>
 </head>
 <body>
+
 
 
 
@@ -702,6 +707,12 @@ main{ display: block; margin-top: 4px; }
         <p class="card-sub">Select a measurement to show or hide it on the chart</p>
         <div class="legend-row" id="measure-legend"></div>
         <canvas id="measure-chart"></canvas>
+      </div>
+
+      <div class="card" id="otter-card">
+        <p class="card-title">Today's buddy</p>
+        <p class="card-sub" id="otter-card-sub">Set your goals in Settings to meet your daily otter.</p>
+        <div id="otter-display" style="display:flex; flex-direction:column; align-items:center; gap:10px; padding: 6px 0 4px;"></div>
       </div>
 
       <div class="card">
@@ -931,6 +942,26 @@ main{ display: block; margin-top: 4px; }
       </div>
 
       <div class="card">
+        <p class="card-title">Daily goals</p>
+        <p class="card-sub">Set targets to see your daily otter on the Overview tab.</p>
+        <div class="field-row">
+          <div>
+            <label for="calorie-goal-input">Calorie goal (kcal)</label>
+            <input type="text" id="calorie-goal-input" inputmode="decimal" placeholder="e.g. 2000" autocomplete="off" />
+          </div>
+          <div>
+            <label for="protein-goal-input">Protein goal (g)</label>
+            <input type="text" id="protein-goal-input" inputmode="decimal" placeholder="e.g. 120" autocomplete="off" />
+          </div>
+        </div>
+        <div class="btn-row">
+          <button type="button" class="primary" id="goals-save-btn">Save goals</button>
+          <button type="button" class="secondary" id="goals-clear-btn">Clear goals</button>
+        </div>
+        <span class="status-msg" id="goals-status" style="margin-top:12px; display:block;"></span>
+      </div>
+
+      <div class="card">
         <p class="card-title">Theme</p>
         <p class="card-sub">Pick a look for the app</p>
         <div class="theme-grid" id="theme-grid"></div>
@@ -964,7 +995,9 @@ main{ display: block; margin-top: 4px; }
 
 
 
+
 <script>
+
 
 
 
@@ -1023,7 +1056,7 @@ let state = {
   measurements: [],
   calories: [],
   chatHistory: [],
-  settings: { weightUnit: 'kg', measureUnit: 'cm', theme: 'vibrant', apiKey: '' },
+  settings: { weightUnit: 'kg', measureUnit: 'cm', theme: 'vibrant', apiKey: '', calorieGoal: null, proteinGoal: null },
   loaded: false
 };
 let lastKnownLevel = 1;
@@ -1179,7 +1212,7 @@ function init() {
     state.measurements = loadJSON(STORE.measure, []).sort((a, b) => a.date.localeCompare(b.date));
     state.calories = loadJSON(STORE.calories, []).sort((a, b) => a.date.localeCompare(b.date));
     state.chatHistory = loadJSON(STORE.chat, []);
-    state.settings = loadJSON(STORE.settings, { weightUnit: 'kg', measureUnit: 'cm', theme: 'vibrant', apiKey: '' });
+    state.settings = loadJSON(STORE.settings, { weightUnit: 'kg', measureUnit: 'cm', theme: 'vibrant', apiKey: '', calorieGoal: null, proteinGoal: null });
     if (!state.settings.theme) state.settings.theme = 'vibrant';
     if (!state.settings.apiKey) state.settings.apiKey = '';
     state.loaded = true;
@@ -1190,6 +1223,8 @@ function init() {
     document.getElementById('measure-unit-select').value = state.settings.measureUnit;
     document.getElementById('calorie-date').value = todayStr();
     document.getElementById('calorie-log-date').value = todayStr();
+    if (state.settings.calorieGoal) document.getElementById('calorie-goal-input').value = state.settings.calorieGoal;
+    if (state.settings.proteinGoal) document.getElementById('protein-goal-input').value = state.settings.proteinGoal;
 
     lastKnownLevel = computeStats().level;
     applyTheme(state.settings.theme, false);
@@ -1713,7 +1748,7 @@ function importDataFromFile(file) {
     state.measurements = measurements.map(m => ({ ...m, id: m.id || uid() })).sort((a, b) => a.date.localeCompare(b.date));
     state.calories = calories.map(c => ({ ...c, id: c.id || uid() })).sort((a, b) => a.date.localeCompare(b.date));
     if (parsed.settings && typeof parsed.settings === 'object') {
-      state.settings = Object.assign({ weightUnit: 'kg', measureUnit: 'cm', theme: 'vibrant' }, parsed.settings);
+      state.settings = Object.assign({ weightUnit: 'kg', measureUnit: 'cm', theme: 'vibrant', calorieGoal: null, proteinGoal: null }, parsed.settings);
     }
     // Backups never contain the API key (it's stripped on export) — keep whatever
     // key is already saved in this browser rather than wiping it on import.
@@ -1771,6 +1806,131 @@ function formatMacroLine(macros) {
   return 'P ' + Math.round(macros.protein) + 'g · C ' + Math.round(macros.carbs) + 'g · F ' + Math.round(macros.fat) + 'g';
 }
 
+// ---------- Daily goals: otter mascot ----------
+// Colors use var(--x) so the SAME markup automatically re-colors when the
+// theme changes — no re-render needed on theme switch, only on goal status change.
+const OTTER_HAPPY_SVG = `
+<svg viewBox="0 0 240 220" width="150" height="138" role="img" aria-label="Happy otter — within your goals today">
+  <ellipse cx="120" cy="152" rx="72" ry="54" fill="var(--periwinkle)"/>
+  <ellipse cx="120" cy="163" rx="42" ry="38" fill="var(--surface)"/>
+  <ellipse cx="97" cy="196" rx="14" ry="10" fill="var(--periwinkle)"/>
+  <ellipse cx="143" cy="196" rx="14" ry="10" fill="var(--periwinkle)"/>
+  <circle cx="80" cy="46" r="15" fill="var(--periwinkle)"/>
+  <circle cx="160" cy="46" r="15" fill="var(--periwinkle)"/>
+  <circle cx="80" cy="48" r="7" fill="var(--periwinkle-soft)"/>
+  <circle cx="160" cy="48" r="7" fill="var(--periwinkle-soft)"/>
+  <circle cx="120" cy="88" r="54" fill="var(--periwinkle)"/>
+  <ellipse cx="120" cy="98" rx="36" ry="32" fill="var(--surface)"/>
+  <circle cx="92" cy="102" r="9" fill="var(--positive)" opacity="0.45"/>
+  <circle cx="148" cy="102" r="9" fill="var(--positive)" opacity="0.45"/>
+  <path d="M 94 80 Q 101 69 108 80" stroke="var(--ink)" stroke-width="5.5" fill="none" stroke-linecap="round"/>
+  <path d="M 132 80 Q 139 69 146 80" stroke="var(--ink)" stroke-width="5.5" fill="none" stroke-linecap="round"/>
+  <ellipse cx="120" cy="97" rx="8" ry="6" fill="var(--ink)"/>
+  <path d="M 100 112 Q 120 128 140 112" stroke="var(--ink)" stroke-width="5.5" fill="none" stroke-linecap="round"/>
+  <path d="M 180 60 l 4 10 l 10 4 l -10 4 l -4 10 l -4 -10 l -10 -4 l 10 -4 Z" fill="var(--positive)" opacity="0.85"/>
+</svg>`;
+
+const OTTER_SAD_SVG = `
+<svg viewBox="0 0 240 220" width="150" height="138" role="img" aria-label="Sad otter — over a goal today">
+  <ellipse cx="120" cy="152" rx="72" ry="54" fill="var(--ink-faint)"/>
+  <ellipse cx="120" cy="163" rx="42" ry="38" fill="var(--surface)"/>
+  <ellipse cx="97" cy="196" rx="14" ry="10" fill="var(--ink-faint)"/>
+  <ellipse cx="143" cy="196" rx="14" ry="10" fill="var(--ink-faint)"/>
+  <circle cx="80" cy="50" r="15" fill="var(--ink-faint)"/>
+  <circle cx="160" cy="50" r="15" fill="var(--ink-faint)"/>
+  <circle cx="80" cy="52" r="7" fill="var(--surface)"/>
+  <circle cx="160" cy="52" r="7" fill="var(--surface)"/>
+  <circle cx="120" cy="90" r="54" fill="var(--ink-faint)"/>
+  <ellipse cx="120" cy="100" rx="36" ry="32" fill="var(--surface)"/>
+  <path d="M 88 82 L 104 88" stroke="var(--ink)" stroke-width="4.5" fill="none" stroke-linecap="round"/>
+  <path d="M 152 82 L 136 88" stroke="var(--ink)" stroke-width="4.5" fill="none" stroke-linecap="round"/>
+  <circle cx="100" cy="97" r="5" fill="var(--ink)"/>
+  <circle cx="140" cy="97" r="5" fill="var(--ink)"/>
+  <ellipse cx="120" cy="110" rx="7" ry="5" fill="var(--ink)"/>
+  <path d="M 102 130 Q 120 117 138 130" stroke="var(--ink)" stroke-width="5.5" fill="none" stroke-linecap="round"/>
+  <path d="M 97 104 Q 92 114 97 122 Q 102 114 97 104 Z" fill="var(--danger)"/>
+</svg>`;
+
+function hasGoals() {
+  return Number(state.settings.calorieGoal) > 0 && Number(state.settings.proteinGoal) > 0;
+}
+
+function renderOtterStatus() {
+  const wrap = document.getElementById('otter-display');
+  const sub = document.getElementById('otter-card-sub');
+  if (!wrap) return;
+
+  if (!hasGoals()) {
+    wrap.innerHTML = '<p class="empty-note" style="text-align:center; padding:10px 0;">No goals set yet.</p>';
+    if (sub) sub.innerHTML = 'Set a calorie and protein goal in <button type="button" class="link-btn" data-tab="settings">Settings</button> to meet your daily otter.';
+    return;
+  }
+
+  const todays = todaysCalorieEntries();
+  const calTotal = todays.reduce((sum, c) => sum + Number(c.calories), 0);
+  const macros = sumMacros(todays);
+  const calGoal = Number(state.settings.calorieGoal);
+  const proteinGoal = Number(state.settings.proteinGoal);
+
+  const overCalories = calTotal > calGoal;
+  const overProtein = macros.protein > proteinGoal;
+  const isHappy = !overCalories && !overProtein;
+
+  let statusText;
+  if (isHappy) {
+    statusText = todays.length > 0 ? "Within both goals today — nice work!" : "No calories logged yet today.";
+  } else if (overCalories && overProtein) {
+    statusText = "Over both your calorie and protein goals today.";
+  } else if (overCalories) {
+    statusText = "Over your calorie goal today.";
+  } else {
+    statusText = "Over your protein goal today.";
+  }
+
+  wrap.innerHTML = (isHappy ? OTTER_HAPPY_SVG : OTTER_SAD_SVG) +
+    `<p style="font-weight:700; font-size:13.5px; text-align:center; margin:0;">${statusText}</p>
+     <p class="mono" style="font-size:12px; color:var(--ink-faint); text-align:center; margin:0;">
+       ${calTotal} / ${calGoal} kcal · ${Math.round(macros.protein)} / ${proteinGoal}g protein
+     </p>`;
+
+  if (sub) sub.textContent = "Based on what you've logged today.";
+}
+
+function setupGoalsForm() {
+  const calInput = document.getElementById('calorie-goal-input');
+  const proteinInput = document.getElementById('protein-goal-input');
+  const saveBtn = document.getElementById('goals-save-btn');
+  const clearBtn = document.getElementById('goals-clear-btn');
+
+  if (saveBtn) {
+    saveBtn.addEventListener('click', () => {
+      const calGoal = parseDecimal(calInput.value);
+      const proteinGoal = parseDecimal(proteinInput.value);
+      if (isNaN(calGoal) || calGoal <= 0 || isNaN(proteinGoal) || proteinGoal <= 0) {
+        flashStatus('goals-status', '⚠ Enter both a calorie and protein goal to save', true);
+        return;
+      }
+      state.settings.calorieGoal = Math.round(calGoal);
+      state.settings.proteinGoal = Math.round(proteinGoal);
+      saveJSON(STORE.settings, state.settings);
+      renderOtterStatus();
+      flashStatus('goals-status', '✓ Goals saved');
+    });
+  }
+
+  if (clearBtn) {
+    clearBtn.addEventListener('click', () => {
+      state.settings.calorieGoal = null;
+      state.settings.proteinGoal = null;
+      saveJSON(STORE.settings, state.settings);
+      if (calInput) calInput.value = '';
+      if (proteinInput) proteinInput.value = '';
+      renderOtterStatus();
+      flashStatus('goals-status', 'Goals cleared');
+    });
+  }
+}
+
 function renderCalorieToday() {
   const readout = document.getElementById('calorie-today-readout');
   const secondary = document.getElementById('calorie-today-secondary');
@@ -1789,6 +1949,7 @@ function renderCalorieToday() {
   const macroLine = todays.length > 0 ? formatMacroLine(macros) : '';
   if (macrosEl) macrosEl.textContent = macroLine;
   if (chatMacrosEl) chatMacrosEl.textContent = macroLine;
+  renderOtterStatus();
 }
 
 let editingCalorieId = null;
@@ -2381,20 +2542,23 @@ function afterSave(saveOk, statusElId) {
 
 // ---------- Tabs ----------
 function setupTabs() {
-  const bottomTabs = document.querySelectorAll('.tab-btn');
-  const tabTriggers = document.querySelectorAll('[data-tab]');
-
   function goToTab(tabName) {
     const panel = document.getElementById('panel-' + tabName);
     if (!panel) return;
-    bottomTabs.forEach(b => b.classList.toggle('active', b.dataset.tab === tabName));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === tabName));
     document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
     panel.classList.add('active');
     if (tabName === 'dashboard') { drawWeightChart(); drawMeasureChart(); }
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
-  tabTriggers.forEach(el => el.addEventListener('click', () => goToTab(el.dataset.tab)));
+  // Delegated on the document so this also covers [data-tab] elements created
+  // later at runtime (e.g. the "set goals in Settings" link inside the otter
+  // card, which doesn't exist yet when this function first runs).
+  document.addEventListener('click', e => {
+    const trigger = e.target.closest('[data-tab]');
+    if (trigger) goToTab(trigger.dataset.tab);
+  });
 }
 
 // ---------- Level up + confetti ----------
@@ -2560,6 +2724,7 @@ document.addEventListener('DOMContentLoaded', () => {
   safeCall(setupSettings, 'settings');
   safeCall(setupCalorieManualForm, 'calorie manual form');
   safeCall(setupInstallButton, 'install button');
+  safeCall(setupGoalsForm, 'goals form');
   safeCall(renderMeasureLegend, 'measure legend');
 
   // init() loads your actual data and renders the app — this one we do want
@@ -2638,6 +2803,7 @@ function setupInstallButton() {
     btn.style.display = 'none';
   });
 }
+
 
 
 
