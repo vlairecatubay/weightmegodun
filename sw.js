@@ -3,7 +3,7 @@
 // even without a network connection. Your data itself lives in localStorage,
 // not here — this only caches the files needed to load the app.
 
-const CACHE_VERSION = 'weightmegodun-v1';
+const CACHE_VERSION = 'weightmegodun-v2';
 const APP_SHELL = [
   './',
   './index.html',

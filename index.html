@@ -8,6 +8,10 @@
 
 
 
+
+
+
+
 <link rel="manifest" href="manifest.json" />
 <meta name="theme-color" content="#A29CF0" />
 <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png" />
@@ -21,7 +25,14 @@
 
 
 
+
+
+
+
 <style>
+
+
+
 
 
 
@@ -286,6 +297,19 @@ body{
 
 /* ---------- Nav card grid ---------- */
 .nav-grid{ display:grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px; }
+
+/* ---------- Otter goal cards ---------- */
+.otter-grid{ display:grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px; }
+.otter-goal-card{ text-align:center; padding: 16px 12px; }
+.otter-goal-card .card-title{ text-align:left; }
+.otter-goal-card .card-sub{ text-align:left; margin-bottom: 8px; }
+.otter-display{ display:flex; flex-direction:column; align-items:center; gap:6px; padding: 4px 0 2px; }
+.otter-display svg{ width: 100%; max-width: 108px; height: auto; }
+.otter-display .otter-status-text{ font-weight:700; font-size:12px; text-align:center; margin:0; line-height:1.3; }
+.otter-display .otter-readout-text{ font-size:11px; color:var(--ink-faint); text-align:center; margin:0; }
+@media (max-width: 380px){
+  .otter-grid{ grid-template-columns: 1fr; }
+}
 .nav-card{
   border-radius: 22px; padding: 18px; cursor: pointer; border: none; text-align: left;
   display:flex; flex-direction: column; gap: 26px; min-height: 128px; position: relative;
@@ -587,9 +611,15 @@ main{ display: block; margin-top: 4px; }
 
 
 
+
+
+
 </style>
 </head>
 <body>
+
+
+
 
 
 
@@ -669,6 +699,19 @@ main{ display: block; margin-top: 4px; }
     <!-- ===================== DASHBOARD ===================== -->
     <section id="panel-dashboard" class="panel active">
 
+      <div class="otter-grid">
+        <div class="card otter-goal-card">
+          <p class="card-title">Calorie goal</p>
+          <p class="card-sub" id="otter-calorie-sub">Set a goal in Settings.</p>
+          <div id="otter-calorie-display" class="otter-display"></div>
+        </div>
+        <div class="card otter-goal-card">
+          <p class="card-title">Protein goal</p>
+          <p class="card-sub" id="otter-protein-sub">Set a goal in Settings.</p>
+          <div id="otter-protein-display" class="otter-display"></div>
+        </div>
+      </div>
+
       <div class="stat-card">
         <div class="stat-icon">⚖️</div>
         <div class="stat-info">
@@ -707,12 +750,6 @@ main{ display: block; margin-top: 4px; }
         <p class="card-sub">Select a measurement to show or hide it on the chart</p>
         <div class="legend-row" id="measure-legend"></div>
         <canvas id="measure-chart"></canvas>
-      </div>
-
-      <div class="card" id="otter-card">
-        <p class="card-title">Today's buddy</p>
-        <p class="card-sub" id="otter-card-sub">Set your goals in Settings to meet your daily otter.</p>
-        <div id="otter-display" style="display:flex; flex-direction:column; align-items:center; gap:10px; padding: 6px 0 4px;"></div>
       </div>
 
       <div class="card">
@@ -922,6 +959,8 @@ main{ display: block; margin-top: 4px; }
         <p class="card-title">Install app</p>
         <p class="card-sub">Add WeightMeGodun to your home screen for a full-screen, app-like experience — works offline once installed.</p>
         <button type="button" class="primary" id="install-app-btn" style="display:none;">Install app</button>
+        <button type="button" class="secondary" id="force-refresh-btn" style="margin-top:10px;">Force refresh app</button>
+        <p class="card-sub" style="margin:10px 0 0;">If the app seems to be showing old data or behaving oddly after an update, tap this to clear the cached version and reload the latest one. Your logged data is untouched — only cached app files are cleared.</p>
       </div>
 
       <div class="card">
@@ -996,7 +1035,13 @@ main{ display: block; margin-top: 4px; }
 
 
 
+
+
+
 <script>
+
+
+
 
 
 
@@ -1810,7 +1855,7 @@ function formatMacroLine(macros) {
 // Colors use var(--x) so the SAME markup automatically re-colors when the
 // theme changes — no re-render needed on theme switch, only on goal status change.
 const OTTER_HAPPY_SVG = `
-<svg viewBox="0 0 240 220" width="150" height="138" role="img" aria-label="Happy otter — within your goals today">
+<svg viewBox="0 0 240 220" width="150" height="138" role="img" aria-label="Happy otter — goal met">
   <ellipse cx="120" cy="152" rx="72" ry="54" fill="var(--periwinkle)"/>
   <ellipse cx="120" cy="163" rx="42" ry="38" fill="var(--surface)"/>
   <ellipse cx="97" cy="196" rx="14" ry="10" fill="var(--periwinkle)"/>
@@ -1831,7 +1876,7 @@ const OTTER_HAPPY_SVG = `
 </svg>`;
 
 const OTTER_SAD_SVG = `
-<svg viewBox="0 0 240 220" width="150" height="138" role="img" aria-label="Sad otter — over a goal today">
+<svg viewBox="0 0 240 220" width="150" height="138" role="img" aria-label="Sad otter — goal not met">
   <ellipse cx="120" cy="152" rx="72" ry="54" fill="var(--ink-faint)"/>
   <ellipse cx="120" cy="163" rx="42" ry="38" fill="var(--surface)"/>
   <ellipse cx="97" cy="196" rx="14" ry="10" fill="var(--ink-faint)"/>
@@ -1851,49 +1896,58 @@ const OTTER_SAD_SVG = `
   <path d="M 97 104 Q 92 114 97 122 Q 102 114 97 104 Z" fill="var(--danger)"/>
 </svg>`;
 
-function hasGoals() {
-  return Number(state.settings.calorieGoal) > 0 && Number(state.settings.proteinGoal) > 0;
-}
-
-function renderOtterStatus() {
-  const wrap = document.getElementById('otter-display');
-  const sub = document.getElementById('otter-card-sub');
+function renderCalorieOtter() {
+  const wrap = document.getElementById('otter-calorie-display');
+  const sub = document.getElementById('otter-calorie-sub');
   if (!wrap) return;
 
-  if (!hasGoals()) {
-    wrap.innerHTML = '<p class="empty-note" style="text-align:center; padding:10px 0;">No goals set yet.</p>';
-    if (sub) sub.innerHTML = 'Set a calorie and protein goal in <button type="button" class="link-btn" data-tab="settings">Settings</button> to meet your daily otter.';
+  const calGoal = Number(state.settings.calorieGoal);
+  if (!(calGoal > 0)) {
+    wrap.innerHTML = '<p class="empty-note" style="text-align:center; padding:6px 0; font-size:12px;">No goal set</p>';
+    if (sub) sub.innerHTML = '<button type="button" class="link-btn" data-tab="settings">Set a goal</button> in Settings.';
     return;
   }
 
   const todays = todaysCalorieEntries();
   const calTotal = todays.reduce((sum, c) => sum + Number(c.calories), 0);
-  const macros = sumMacros(todays);
-  const calGoal = Number(state.settings.calorieGoal);
-  const proteinGoal = Number(state.settings.proteinGoal);
-
-  const overCalories = calTotal > calGoal;
-  const overProtein = macros.protein > proteinGoal;
-  const isHappy = !overCalories && !overProtein;
-
-  let statusText;
-  if (isHappy) {
-    statusText = todays.length > 0 ? "Within both goals today — nice work!" : "No calories logged yet today.";
-  } else if (overCalories && overProtein) {
-    statusText = "Over both your calorie and protein goals today.";
-  } else if (overCalories) {
-    statusText = "Over your calorie goal today.";
-  } else {
-    statusText = "Over your protein goal today.";
-  }
+  const isHappy = calTotal <= calGoal;
+  const statusText = todays.length === 0
+    ? 'Nothing logged yet today.'
+    : (isHappy ? 'Within your calorie goal — nice work!' : 'Over your calorie goal today.');
 
   wrap.innerHTML = (isHappy ? OTTER_HAPPY_SVG : OTTER_SAD_SVG) +
-    `<p style="font-weight:700; font-size:13.5px; text-align:center; margin:0;">${statusText}</p>
-     <p class="mono" style="font-size:12px; color:var(--ink-faint); text-align:center; margin:0;">
-       ${calTotal} / ${calGoal} kcal · ${Math.round(macros.protein)} / ${proteinGoal}g protein
-     </p>`;
+    `<p class="otter-status-text">${statusText}</p>
+     <p class="otter-readout-text mono">${calTotal} / ${calGoal} kcal</p>`;
 
-  if (sub) sub.textContent = "Based on what you've logged today.";
+  if (sub) sub.textContent = "Based on today's log.";
+}
+
+function renderProteinOtter() {
+  const wrap = document.getElementById('otter-protein-display');
+  const sub = document.getElementById('otter-protein-sub');
+  if (!wrap) return;
+
+  const proteinGoal = Number(state.settings.proteinGoal);
+  if (!(proteinGoal > 0)) {
+    wrap.innerHTML = '<p class="empty-note" style="text-align:center; padding:6px 0; font-size:12px;">No goal set</p>';
+    if (sub) sub.innerHTML = '<button type="button" class="link-btn" data-tab="settings">Set a goal</button> in Settings.';
+    return;
+  }
+
+  const todays = todaysCalorieEntries();
+  const macros = sumMacros(todays);
+  // Protein works the opposite way from calories: the goal is a minimum to
+  // reach, not a ceiling — so it's sad if you're UNDER it, happy at or above.
+  const isHappy = macros.protein >= proteinGoal;
+  const statusText = todays.length === 0
+    ? 'Nothing logged yet today.'
+    : (isHappy ? "Hit your protein goal — nice work!" : "Under your protein goal today.");
+
+  wrap.innerHTML = (isHappy ? OTTER_HAPPY_SVG : OTTER_SAD_SVG) +
+    `<p class="otter-status-text">${statusText}</p>
+     <p class="otter-readout-text mono">${Math.round(macros.protein)} / ${proteinGoal}g</p>`;
+
+  if (sub) sub.textContent = "Based on today's log.";
 }
 
 function setupGoalsForm() {
@@ -1913,7 +1967,8 @@ function setupGoalsForm() {
       state.settings.calorieGoal = Math.round(calGoal);
       state.settings.proteinGoal = Math.round(proteinGoal);
       saveJSON(STORE.settings, state.settings);
-      renderOtterStatus();
+      renderCalorieOtter();
+      renderProteinOtter();
       flashStatus('goals-status', '✓ Goals saved');
     });
   }
@@ -1925,7 +1980,8 @@ function setupGoalsForm() {
       saveJSON(STORE.settings, state.settings);
       if (calInput) calInput.value = '';
       if (proteinInput) proteinInput.value = '';
-      renderOtterStatus();
+      renderCalorieOtter();
+      renderProteinOtter();
       flashStatus('goals-status', 'Goals cleared');
     });
   }
@@ -1949,7 +2005,8 @@ function renderCalorieToday() {
   const macroLine = todays.length > 0 ? formatMacroLine(macros) : '';
   if (macrosEl) macrosEl.textContent = macroLine;
   if (chatMacrosEl) chatMacrosEl.textContent = macroLine;
-  renderOtterStatus();
+  renderCalorieOtter();
+  renderProteinOtter();
 }
 
 let editingCalorieId = null;
@@ -2168,12 +2225,11 @@ function renderChatWindow() {
     } else if (msg.role === 'logged') {
       bubble.className = 'chat-bubble logged';
       const items = msg.items || [];
-      const breakdown = items.map(it =>
-        `<div class="chat-item-row"><span>${it.description}</span><span class="mono">${it.calories} kcal</span></div>`
-      ).join('');
+      const names = items.map(it => it.description).join(', ');
       bubble.innerHTML = `
-        <div class="chat-item-row" style="font-weight:800;"><span>✓ Logged ${msg.calories} kcal</span></div>
-        ${breakdown}
+        <div class="chat-item-row" style="font-weight:800;"><span>✓ Logged — ${msg.calories} kcal total</span></div>
+        <div class="chat-item-row" style="font-weight:500; opacity:0.85;"><span>${names}</span></div>
+        <div class="chat-item-row" style="font-weight:500; opacity:0.7; font-size:11px;"><span>See full breakdown, edit, or delete in the log below ↓</span></div>
       `;
     } else if (msg.role === 'error') {
       bubble.className = 'chat-bubble error';
@@ -2725,6 +2781,7 @@ document.addEventListener('DOMContentLoaded', () => {
   safeCall(setupCalorieManualForm, 'calorie manual form');
   safeCall(setupInstallButton, 'install button');
   safeCall(setupGoalsForm, 'goals form');
+  safeCall(setupForceRefresh, 'force refresh button');
   safeCall(renderMeasureLegend, 'measure legend');
 
   // init() loads your actual data and renders the app — this one we do want
@@ -2803,6 +2860,37 @@ function setupInstallButton() {
     btn.style.display = 'none';
   });
 }
+
+function setupForceRefresh() {
+  const btn = document.getElementById('force-refresh-btn');
+  if (!btn) return;
+  btn.addEventListener('click', async () => {
+    btn.disabled = true;
+    btn.textContent = 'Refreshing…';
+    try {
+      if ('serviceWorker' in navigator) {
+        const registrations = await navigator.serviceWorker.getRegistrations();
+        await Promise.all(registrations.map(r => r.unregister()));
+      }
+      if ('caches' in window) {
+        const keys = await caches.keys();
+        await Promise.all(keys.map(k => caches.delete(k)));
+      }
+    } catch (err) {
+      console.error('Force refresh cleanup error:', err);
+      // Not critical — your logged data lives in localStorage, untouched by any of this.
+    } finally {
+      // Cache-bust the reload itself so even the navigation request skips any
+      // leftover HTTP cache, not just the service worker cache.
+      const url = new URL(window.location.href);
+      url.searchParams.set('_refresh', Date.now());
+      window.location.href = url.toString();
+    }
+  });
+}
+
+
+
 
 
 
