@@ -17,6 +17,8 @@
 
 
 
+
+
 <link rel="manifest" href="manifest.json" />
 <meta name="theme-color" content="#A29CF0" />
 <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png" />
@@ -39,7 +41,10 @@
 
 
 
+
+
 <style>
+
 
 
 
@@ -369,6 +374,16 @@ body{
 .ebv-banner-sub{ font-size:10.5px; color:rgba(255,255,255,0.8); margin-top:1px; font-weight:500; }
 .ebv-banner.neutral .ebv-banner-sub{ color: var(--ink-faint); }
 
+/* ---------- Pet game card ---------- */
+#pet-display{ display:flex; flex-direction:column; align-items:center; text-align:center; padding: 6px 0 2px; }
+.pet-stage{ margin-bottom: 8px; }
+.pet-status{ font-family:'Poppins', sans-serif; font-weight:700; font-size:15px; margin:0; }
+.pet-status-healthy{ color: var(--positive); }
+.pet-status-slight{ color: var(--warn); }
+.pet-status-severe{ color: var(--danger); }
+.pet-status-dead{ color: var(--ink-faint); }
+.pet-flavor{ font-size:12px; color:var(--ink-faint); margin:5px 0 0; max-width: 240px; }
+
 .nav-card{
   border-radius: 22px; padding: 18px; cursor: pointer; border: none; text-align: left;
   display:flex; flex-direction: column; gap: 26px; min-height: 128px; position: relative;
@@ -679,9 +694,11 @@ main{ display: block; margin-top: 4px; }
 
 
 
+
 </style>
 </head>
 <body>
+
 
 
 
@@ -784,6 +801,12 @@ main{ display: block; margin-top: 4px; }
         <p class="card-title">Energy balance</p>
         <p class="card-sub" id="energy-card-sub">How today's intake compares to what you've burned.</p>
         <div id="energy-display"></div>
+      </div>
+
+      <div class="card" id="pet-card">
+        <p class="card-title">Your pet</p>
+        <p class="card-sub" id="pet-card-sub">Stays healthy while you stay on track.</p>
+        <div id="pet-display"></div>
       </div>
 
       <div class="stat-card">
@@ -1186,7 +1209,9 @@ main{ display: block; margin-top: 4px; }
 
 
 
+
 <script>
+
 
 
 
@@ -1257,7 +1282,7 @@ let state = {
   settings: {
     weightUnit: 'kg', measureUnit: 'cm', theme: 'vibrant', apiKey: '',
     calorieGoal: null, proteinGoal: null,
-    birthdate: null, sex: null, heightCm: null, restingCalories: null
+    birthdate: null, sex: null, heightCm: null, restingCalories: null, petLastRevivedDate: null
   },
   loaded: false
 };
@@ -1415,7 +1440,7 @@ function init() {
     state.calories = loadJSON(STORE.calories, []).sort((a, b) => a.date.localeCompare(b.date));
     state.exercise = loadJSON(STORE.exercise, []).sort((a, b) => a.date.localeCompare(b.date));
     state.chatHistory = loadJSON(STORE.chat, []);
-    state.settings = loadJSON(STORE.settings, { weightUnit: 'kg', measureUnit: 'cm', theme: 'vibrant', apiKey: '', calorieGoal: null, proteinGoal: null, birthdate: null, sex: null, heightCm: null, restingCalories: null });
+    state.settings = loadJSON(STORE.settings, { weightUnit: 'kg', measureUnit: 'cm', theme: 'vibrant', apiKey: '', calorieGoal: null, proteinGoal: null, birthdate: null, sex: null, heightCm: null, restingCalories: null, petLastRevivedDate: null });
     if (!state.settings.theme) state.settings.theme = 'vibrant';
     if (!state.settings.apiKey) state.settings.apiKey = '';
     // One-time pre-fill for this app's profile (only applies if nothing has
@@ -1967,7 +1992,7 @@ function importDataFromFile(file) {
     state.calories = calories.map(c => ({ ...c, id: c.id || uid() })).sort((a, b) => a.date.localeCompare(b.date));
     state.exercise = exercise.map(e => ({ ...e, id: e.id || uid() })).sort((a, b) => a.date.localeCompare(b.date));
     if (parsed.settings && typeof parsed.settings === 'object') {
-      state.settings = Object.assign({ weightUnit: 'kg', measureUnit: 'cm', theme: 'vibrant', calorieGoal: null, proteinGoal: null, birthdate: null, sex: null, heightCm: null, restingCalories: null }, parsed.settings);
+      state.settings = Object.assign({ weightUnit: 'kg', measureUnit: 'cm', theme: 'vibrant', calorieGoal: null, proteinGoal: null, birthdate: null, sex: null, heightCm: null, restingCalories: null, petLastRevivedDate: null }, parsed.settings);
     }
     // Backups never contain the API key (it's stripped on export) — keep whatever
     // key is already saved in this browser rather than wiping it on import.
@@ -2063,6 +2088,184 @@ function todaysExerciseEntries() {
 
 function todaysExerciseCalories() {
   return todaysExerciseEntries().reduce((sum, e) => sum + Number(e.caloriesBurned), 0);
+}
+
+// ---------- Virtual pet game ----------
+// "On track" for a given past day means: logged something that day, and stayed
+// within whichever of your calorie/protein goals are currently set. Uses today's
+// goal settings retroactively (the app doesn't store what your goal was on any
+// given past day, so this is a reasonable simplification).
+function hasAnyPetGoal() {
+  return Number(state.settings.calorieGoal) > 0 || Number(state.settings.proteinGoal) > 0;
+}
+
+function isDayOnTrack(dateStr) {
+  const calGoal = Number(state.settings.calorieGoal);
+  const proteinGoal = Number(state.settings.proteinGoal);
+  const hasCalGoal = calGoal > 0;
+  const hasProteinGoal = proteinGoal > 0;
+  if (!hasCalGoal && !hasProteinGoal) return null;
+
+  const dayEntries = state.calories.filter(c => c.date === dateStr);
+  if (dayEntries.length === 0) return false; // no logging that day counts as off track
+
+  const calTotal = dayEntries.reduce((sum, c) => sum + Number(c.calories), 0);
+  const proteinTotal = dayEntries.reduce((sum, c) => sum + Number(c.protein || 0), 0);
+
+  let ok = true;
+  if (hasCalGoal) ok = ok && calTotal <= calGoal;
+  if (hasProteinGoal) ok = ok && proteinTotal >= proteinGoal;
+  return ok;
+}
+
+// Looks back from yesterday (today is still in progress, so it isn't judged yet)
+// and counts the current consecutive streak — either a run of off-track days or
+// a run of on-track days, whichever is currently active.
+function computePetStreaks() {
+  const revivedDate = state.settings.petLastRevivedDate;
+  const cursor = new Date();
+  cursor.setDate(cursor.getDate() - 1);
+
+  let consecutiveBad = 0;
+  let consecutiveGood = 0;
+  let mode = null;
+
+  for (let i = 0; i < 30; i++) {
+    const dateStr = cursor.toISOString().slice(0, 10);
+    if (revivedDate && dateStr < revivedDate) break;
+
+    const onTrack = isDayOnTrack(dateStr);
+    if (onTrack === null) break;
+
+    if (mode === null) mode = onTrack ? 'good' : 'bad';
+    if (mode === 'bad') {
+      if (onTrack) break;
+      consecutiveBad++;
+    } else {
+      if (!onTrack) break;
+      consecutiveGood++;
+    }
+    cursor.setDate(cursor.getDate() - 1);
+  }
+
+  return { consecutiveBad, consecutiveGood };
+}
+
+function computePetStatus() {
+  if (!hasAnyPetGoal()) return { health: 'unknown', consecutiveBad: 0, consecutiveGood: 0 };
+  // First time the pet becomes active (goals just got set, or this is the very
+  // first render with goals already present from an import), give it a fresh
+  // start rather than judging it against days before it "existed".
+  if (!state.settings.petLastRevivedDate) {
+    state.settings.petLastRevivedDate = todayStr();
+    saveJSON(STORE.settings, state.settings);
+  }
+  const { consecutiveBad, consecutiveGood } = computePetStreaks();
+  let health;
+  if (consecutiveBad > 7) health = 'dead';
+  else if (consecutiveBad >= 5) health = 'severe';
+  else if (consecutiveBad >= 3) health = 'slight';
+  else health = 'healthy';
+  return { health, consecutiveBad, consecutiveGood };
+}
+
+const PET_HEALTHY_SVG = `
+<svg viewBox="0 0 200 200" width="150" height="150" role="img" aria-label="Healthy pet">
+  <ellipse cx="100" cy="180" rx="46" ry="8" fill="rgba(0,0,0,0.06)"/>
+  <path d="M60 96 Q56 60 100 56 Q144 60 140 96 Q142 140 100 150 Q58 140 60 96 Z" fill="var(--periwinkle)"/>
+  <path d="M96 56 Q92 40 78 36 Q88 30 100 38 Q104 46 96 56 Z" fill="var(--sage)"/>
+  <circle cx="80" cy="92" r="14" fill="#fff"/>
+  <circle cx="120" cy="92" r="14" fill="#fff"/>
+  <circle cx="82" cy="94" r="7" fill="var(--ink)"/>
+  <circle cx="122" cy="94" r="7" fill="var(--ink)"/>
+  <circle cx="70" cy="112" r="8" fill="var(--positive)" opacity="0.35"/>
+  <circle cx="130" cy="112" r="8" fill="var(--positive)" opacity="0.35"/>
+  <path d="M82 118 Q100 132 118 118" stroke="var(--ink)" stroke-width="4" fill="none" stroke-linecap="round"/>
+</svg>`;
+
+const PET_SLIGHT_SVG = `
+<svg viewBox="0 0 200 200" width="150" height="150" role="img" aria-label="Slightly sick pet">
+  <ellipse cx="100" cy="180" rx="46" ry="8" fill="rgba(0,0,0,0.06)"/>
+  <path d="M62 98 Q58 62 100 58 Q142 62 138 98 Q140 140 100 149 Q60 140 62 98 Z" fill="var(--periwinkle-soft)"/>
+  <path d="M96 58 Q94 46 84 44 Q92 40 100 46 Q102 52 96 58 Z" fill="var(--sage)" opacity="0.7"/>
+  <path d="M70 92 Q80 88 90 92" stroke="var(--ink)" stroke-width="4" fill="none" stroke-linecap="round"/>
+  <path d="M110 92 Q120 88 130 92" stroke="var(--ink)" stroke-width="4" fill="none" stroke-linecap="round"/>
+  <circle cx="80" cy="98" r="5" fill="var(--ink)"/>
+  <circle cx="120" cy="98" r="5" fill="var(--ink)"/>
+  <path d="M85 122 Q100 116 115 122" stroke="var(--ink)" stroke-width="4" fill="none" stroke-linecap="round"/>
+  <path d="M135 78 q6 6 0 12" stroke="var(--teal)" stroke-width="3" fill="none" stroke-linecap="round"/>
+</svg>`;
+
+const PET_SEVERE_SVG = `
+<svg viewBox="0 0 200 200" width="150" height="150" role="img" aria-label="Severely sick pet">
+  <ellipse cx="100" cy="182" rx="50" ry="7" fill="rgba(0,0,0,0.06)"/>
+  <path d="M58 104 Q56 70 100 66 Q144 70 142 104 Q146 142 100 148 Q54 142 58 104 Z" fill="var(--ink-faint)"/>
+  <path d="M96 66 Q98 54 90 50 Q96 46 102 52 Q104 58 96 66 Z" fill="var(--warn)" opacity="0.6"/>
+  <path d="M68 96 L84 104 M84 96 L68 104" stroke="var(--ink)" stroke-width="4" stroke-linecap="round"/>
+  <path d="M116 96 L132 104 M132 96 L116 104" stroke="var(--ink)" stroke-width="4" stroke-linecap="round"/>
+  <path d="M85 126 Q100 118 115 126 Q100 130 85 126 Z" fill="var(--ink)"/>
+  <path d="M140 82 q6 6 0 12" stroke="var(--teal)" stroke-width="3" fill="none" stroke-linecap="round"/>
+  <path d="M60 88 q-6 6 0 12" stroke="var(--teal)" stroke-width="3" fill="none" stroke-linecap="round"/>
+</svg>`;
+
+const PET_DEAD_SVG = `
+<svg viewBox="0 0 200 200" width="150" height="150" role="img" aria-label="Pet needs reviving">
+  <ellipse cx="100" cy="176" rx="50" ry="7" fill="rgba(0,0,0,0.06)"/>
+  <path d="M56 112 Q56 82 100 80 Q144 82 144 112 Q146 140 100 144 Q54 140 56 112 Z" fill="var(--ink-faint)" opacity="0.7"/>
+  <path d="M94 80 Q98 68 90 62 Q98 60 102 68 Q102 74 94 80 Z" fill="var(--ink-faint)"/>
+  <path d="M68 102 L82 110 M82 102 L68 110" stroke="var(--ink)" stroke-width="4" stroke-linecap="round"/>
+  <path d="M118 102 L132 110 M132 102 L118 110" stroke="var(--ink)" stroke-width="4" stroke-linecap="round"/>
+  <path d="M86 126 L114 126" stroke="var(--ink)" stroke-width="4" stroke-linecap="round"/>
+</svg>`;
+
+function renderPet() {
+  const wrap = document.getElementById('pet-display');
+  const sub = document.getElementById('pet-card-sub');
+  if (!wrap) return;
+
+  if (!hasAnyPetGoal()) {
+    wrap.innerHTML = `<p class="empty-note" style="text-align:center; padding:10px 0;">
+      Set a calorie or protein goal in <button type="button" class="link-btn" data-tab="settings">Settings</button> to bring your pet to life.
+    </p>`;
+    if (sub) sub.textContent = 'Stays healthy while you stay on track.';
+    return;
+  }
+
+  const status = computePetStatus();
+  const svgByHealth = { healthy: PET_HEALTHY_SVG, slight: PET_SLIGHT_SVG, severe: PET_SEVERE_SVG, dead: PET_DEAD_SVG };
+  const labelByHealth = { healthy: 'Healthy', slight: 'Feeling a bit off', severe: 'Very sick', dead: "Hasn't made it" };
+
+  let flavorHTML = '';
+  if (status.health === 'healthy' && status.consecutiveGood > 0) {
+    flavorHTML = `<p class="pet-flavor">${status.consecutiveGood}-day on-track streak</p>`;
+  } else if (status.health === 'healthy') {
+    flavorHTML = `<p class="pet-flavor">Stay on track to build a streak</p>`;
+  } else if (status.health !== 'dead') {
+    flavorHTML = `<p class="pet-flavor">${status.consecutiveBad} days off track — get back on track to help recovery</p>`;
+  } else {
+    flavorHTML = `<p class="pet-flavor">${status.consecutiveBad} days off track in a row</p>`;
+  }
+
+  const reviveButtonHTML = status.health === 'dead'
+    ? `<button type="button" class="primary" id="pet-revive-btn" style="margin-top:12px;">Revive</button>`
+    : '';
+
+  wrap.innerHTML = `
+    <div class="pet-stage">${svgByHealth[status.health]}</div>
+    <p class="pet-status pet-status-${status.health}">${labelByHealth[status.health]}</p>
+    ${flavorHTML}
+    ${reviveButtonHTML}
+  `;
+  if (sub) sub.textContent = 'Stays healthy while you stay on track.';
+
+  const reviveBtn = document.getElementById('pet-revive-btn');
+  if (reviveBtn) {
+    reviveBtn.addEventListener('click', () => {
+      state.settings.petLastRevivedDate = todayStr();
+      saveJSON(STORE.settings, state.settings);
+      renderPet();
+    });
+  }
 }
 
 function sumMacros(entries) {
@@ -2319,6 +2522,7 @@ function setupGoalsForm() {
       saveJSON(STORE.settings, state.settings);
       renderCalorieOtter();
       renderProteinOtter();
+      renderPet();
       flashStatus('goals-status', '✓ Goals saved');
     });
   }
@@ -2332,6 +2536,7 @@ function setupGoalsForm() {
       if (proteinInput) proteinInput.value = '';
       renderCalorieOtter();
       renderProteinOtter();
+      renderPet();
       flashStatus('goals-status', 'Goals cleared');
     });
   }
@@ -2358,6 +2563,7 @@ function renderCalorieToday() {
   renderCalorieOtter();
   renderProteinOtter();
   renderEnergyBalance();
+  renderPet();
 }
 
 let editingCalorieId = null;
@@ -3531,6 +3737,7 @@ function setupForceRefresh() {
     }
   });
 }
+
 
 
 
