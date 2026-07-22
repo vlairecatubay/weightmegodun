@@ -16,6 +16,7 @@
 
 
 
+
 <link rel="manifest" href="manifest.json" />
 <meta name="theme-color" content="#A29CF0" />
 <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png" />
@@ -37,7 +38,9 @@
 
 
 
+
 <style>
+
 
 
 
@@ -322,22 +325,49 @@ body{
 }
 
 /* ---------- Energy balance card ---------- */
-.energy-stats-row{ display:grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
-.energy-stat{ display:flex; flex-direction: column; gap: 3px; }
-.energy-stat-num{ font-family:'Poppins', sans-serif; font-weight: 800; font-size: 21px; color: var(--ink); }
-.energy-stat-label{ font-size: 11px; color: var(--ink-faint); line-height: 1.3; }
-.energy-bars{ display:flex; flex-direction: column; gap: 10px; margin-bottom: 14px; }
-.energy-bar-row{ display:flex; align-items: center; gap: 10px; }
-.energy-bar-label{ font-size: 11.5px; font-weight: 600; color: var(--ink-soft); width: 62px; flex-shrink: 0; }
-.energy-bar-track{ flex: 1; height: 10px; border-radius: 6px; background: var(--bg); overflow: hidden; }
-.energy-bar-fill{ height: 100%; border-radius: 6px; transition: width .4s ease; }
-.energy-bar-fill.burned{ background: var(--positive); }
-.energy-bar-fill.consumed{ background: var(--coral-deep); }
-.energy-bar-value{ font-size: 11.5px; font-weight: 700; width: 46px; text-align: right; flex-shrink: 0; }
-.energy-net{ text-align:center; font-weight: 800; font-size: 13.5px; margin: 0; padding: 10px; border-radius: 12px; }
-.energy-net.deficit{ background: var(--positive-soft); color: var(--positive); }
-.energy-net.surplus{ background: var(--danger-soft); color: var(--danger); }
-.energy-net.neutral{ background: var(--bg); color: var(--ink-faint); font-weight: 600; }
+.ebv-ring-wrap{
+  position:relative; width: 168px; height:168px; margin: 4px auto 18px;
+  display:flex; align-items:center; justify-content:center;
+}
+.ebv-ring-wrap svg{ position:absolute; inset:0; transform: rotate(-90deg); }
+.ebv-ring-center{ text-align:center; }
+.ebv-kcal{ font-family:'Poppins', sans-serif; font-weight:800; font-size:28px; color:var(--ink); line-height:1; }
+.ebv-kcal-unit{ font-size:11px; font-weight:600; color:var(--ink-faint); margin-top:5px; }
+.ebv-status-pill{
+  display:inline-block; margin-top:8px; padding:4px 12px; border-radius:20px;
+  color:#fff; font-size:10.5px; font-weight:700; letter-spacing:0.01em;
+}
+.ebv-status-pill.deficit{ background: linear-gradient(135deg, var(--hero-start), var(--hero-end)); }
+.ebv-status-pill.surplus{ background: linear-gradient(135deg, var(--danger), var(--warn)); }
+.ebv-status-pill.neutral{ background: var(--ink-faint); }
+
+.ebv-stats-row{ display:flex; gap:10px; margin-bottom: 14px; }
+.ebv-stat-card{ flex:1; background:var(--bg); border-radius:16px; padding:12px 13px; }
+.ebv-stat-card.filled.deficit{ background: linear-gradient(150deg, var(--hero-start), var(--hero-end)); }
+.ebv-stat-card.filled.surplus{ background: linear-gradient(150deg, var(--danger), var(--warn)); }
+.ebv-stat-icon{
+  width:26px; height:26px; border-radius:8px; display:flex; align-items:center; justify-content:center;
+  background: var(--surface); margin-bottom: 10px;
+}
+.ebv-stat-card.filled .ebv-stat-icon{ background: rgba(255,255,255,0.25); }
+.ebv-stat-num{ font-family:'Poppins', sans-serif; font-weight:800; font-size:17px; color:var(--ink); }
+.ebv-stat-card.filled .ebv-stat-num{ color:#fff; }
+.ebv-stat-label{ font-size:10.5px; color:var(--ink-faint); margin-top:2px; font-weight:500; }
+.ebv-stat-card.filled .ebv-stat-label{ color:rgba(255,255,255,0.8); }
+
+.ebv-banner{ border-radius:16px; padding:12px 14px; display:flex; align-items:center; gap:11px; }
+.ebv-banner.deficit{ background: linear-gradient(120deg, var(--hero-start), var(--hero-end)); }
+.ebv-banner.surplus{ background: linear-gradient(120deg, var(--danger), var(--warn)); }
+.ebv-banner.neutral{ background: var(--bg); }
+.ebv-banner-icon{
+  width:28px; height:28px; border-radius:50%; display:flex; align-items:center; justify-content:center; flex-shrink:0;
+  background: rgba(255,255,255,0.25);
+}
+.ebv-banner.neutral .ebv-banner-icon{ background: var(--surface); }
+.ebv-banner-text{ font-weight:700; font-size:12.5px; color:#fff; }
+.ebv-banner.neutral .ebv-banner-text{ color: var(--ink); font-weight:600; }
+.ebv-banner-sub{ font-size:10.5px; color:rgba(255,255,255,0.8); margin-top:1px; font-weight:500; }
+.ebv-banner.neutral .ebv-banner-sub{ color: var(--ink-faint); }
 
 .nav-card{
   border-radius: 22px; padding: 18px; cursor: pointer; border: none; text-align: left;
@@ -648,9 +678,11 @@ main{ display: block; margin-top: 4px; }
 
 
 
+
 </style>
 </head>
 <body>
+
 
 
 
@@ -1153,7 +1185,9 @@ main{ display: block; margin-top: 4px; }
 
 
 
+
 <script>
+
 
 
 
@@ -2110,45 +2144,106 @@ function renderEnergyBalance() {
   const totalBurn = bmr + exerciseBurned;
   const consumed = todaysCalorieEntries().reduce((sum, c) => sum + Number(c.calories), 0);
 
-  const maxScale = Math.max(totalBurn, consumed, 1);
-  const burnPct = Math.min(100, Math.round((totalBurn / maxScale) * 100));
-  const consumedPct = Math.min(100, Math.round((consumed / maxScale) * 100));
+  const lightningIcon = '<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L4 14h7l-1 8 9-12h-7l1-8z"/></svg>';
+  const forkIcon = '<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8h1a4 4 0 010 8h-1M2 8h16v9a4 4 0 01-4 4H6a4 4 0 01-4-4V8z"/><path d="M6 1v3M10 1v3M14 1v3"/></svg>';
+  const checkIcon = '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>';
+  const alertIcon = '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4M12 17h.01"/><circle cx="12" cy="12" r="9"/></svg>';
+  const mealIcon = '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>';
 
-  let netLineHTML = '<p class="energy-net neutral">Log today\'s meals to see your balance.</p>';
-  if (consumed > 0) {
-    const net = consumed - totalBurn; // negative = deficit, positive = surplus
-    const isDeficit = net <= 0;
-    netLineHTML = `<p class="energy-net ${isDeficit ? 'deficit' : 'surplus'}">
-      ${isDeficit ? '↓' : '↑'} ${Math.abs(Math.round(net))} kcal ${isDeficit ? 'deficit' : 'surplus'} today
-    </p>`;
+  const circumference = 2 * Math.PI * 72;
+  const burnLabel = exerciseBurned > 0
+    ? `Burned today (BMR + exercise)`
+    : `Burned today (resting only)`;
+
+  if (consumed === 0) {
+    wrap.innerHTML = `
+      <div class="ebv-ring-wrap">
+        <svg viewBox="0 0 168 168">
+          <circle cx="84" cy="84" r="72" fill="none" stroke="var(--bg)" stroke-width="14"/>
+          <circle cx="84" cy="84" r="72" fill="none" stroke="var(--ink-faint)" stroke-width="14"
+            stroke-linecap="round" stroke-dasharray="${circumference}" stroke-dashoffset="${circumference}"/>
+        </svg>
+        <div class="ebv-ring-center">
+          <div class="ebv-kcal">${totalBurn}</div>
+          <div class="ebv-kcal-unit">kcal available today</div>
+          <span class="ebv-status-pill neutral">Nothing logged yet</span>
+        </div>
+      </div>
+      <div class="ebv-stats-row">
+        <div class="ebv-stat-card">
+          <div class="ebv-stat-icon" style="color:var(--periwinkle);">${lightningIcon}</div>
+          <div class="ebv-stat-num">${totalBurn}</div>
+          <div class="ebv-stat-label">${burnLabel}</div>
+        </div>
+        <div class="ebv-stat-card">
+          <div class="ebv-stat-icon" style="color:var(--periwinkle);">${forkIcon}</div>
+          <div class="ebv-stat-num">0</div>
+          <div class="ebv-stat-label">Consumed today</div>
+        </div>
+      </div>
+      <div class="ebv-banner neutral">
+        <div class="ebv-banner-icon" style="color:var(--ink-faint);">${mealIcon}</div>
+        <div>
+          <div class="ebv-banner-text">Log today's meals to see your balance</div>
+          <div class="ebv-banner-sub" style="color:var(--ink-faint);">Use the Fitness tab to add food or chat with the AI</div>
+        </div>
+      </div>
+    `;
+    if (sub) sub.textContent = "Based on your profile, weigh-ins, and today's log — resting calories " + (hasManualBMR() ? "from your entry." : "estimated.");
+    return;
   }
 
+  const net = consumed - totalBurn; // negative = deficit, positive = surplus
+  const isDeficit = net <= 0;
+  const statusClass = isDeficit ? 'deficit' : 'surplus';
+  const ringPct = Math.min(100, Math.round((consumed / totalBurn) * 100));
+  const ringOffset = circumference - (circumference * ringPct) / 100;
+
   wrap.innerHTML = `
-    <div class="energy-stats-row">
-      <div class="energy-stat">
-        <span class="energy-stat-num">${bmr}</span>
-        <span class="energy-stat-label">Resting burn (no exercise) — ${hasManualBMR() ? 'your entry' : 'estimated'}</span>
-      </div>
-      <div class="energy-stat">
-        <span class="energy-stat-num">${totalBurn}</span>
-        <span class="energy-stat-label">With exercise today${exerciseBurned > 0 ? ' (+' + exerciseBurned + ')' : ''}</span>
-      </div>
-    </div>
-    <div class="energy-bars">
-      <div class="energy-bar-row">
-        <span class="energy-bar-label">Burned</span>
-        <div class="energy-bar-track"><div class="energy-bar-fill burned" style="width:${burnPct}%"></div></div>
-        <span class="energy-bar-value mono">${totalBurn}</span>
-      </div>
-      <div class="energy-bar-row">
-        <span class="energy-bar-label">Consumed</span>
-        <div class="energy-bar-track"><div class="energy-bar-fill consumed" style="width:${consumedPct}%"></div></div>
-        <span class="energy-bar-value mono">${consumed}</span>
+    <div class="ebv-ring-wrap">
+      <svg viewBox="0 0 168 168">
+        <defs>
+          <linearGradient id="ebvRingGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            ${isDeficit
+              ? '<stop offset="0%" stop-color="var(--hero-start)"/><stop offset="100%" stop-color="var(--hero-end)"/>'
+              : '<stop offset="0%" stop-color="var(--danger)"/><stop offset="100%" stop-color="var(--warn)"/>'}
+          </linearGradient>
+        </defs>
+        <circle cx="84" cy="84" r="72" fill="none" stroke="var(--bg)" stroke-width="14"/>
+        <circle cx="84" cy="84" r="72" fill="none" stroke="url(#ebvRingGrad)" stroke-width="14"
+          stroke-linecap="round" stroke-dasharray="${circumference}" stroke-dashoffset="${ringOffset}"/>
+      </svg>
+      <div class="ebv-ring-center">
+        <div class="ebv-kcal">${Math.abs(Math.round(net))}</div>
+        <div class="ebv-kcal-unit">kcal ${isDeficit ? 'deficit' : 'surplus'}</div>
+        <span class="ebv-status-pill ${statusClass}">${isDeficit ? 'On track today' : 'Over today'}</span>
       </div>
     </div>
-    ${netLineHTML}
+    <div class="ebv-stats-row">
+      <div class="ebv-stat-card">
+        <div class="ebv-stat-icon" style="color:var(--periwinkle);">${lightningIcon}</div>
+        <div class="ebv-stat-num">${totalBurn}</div>
+        <div class="ebv-stat-label">${burnLabel}</div>
+      </div>
+      <div class="ebv-stat-card filled ${statusClass}">
+        <div class="ebv-stat-icon">${forkIcon}</div>
+        <div class="ebv-stat-num">${consumed}</div>
+        <div class="ebv-stat-label">Consumed today</div>
+      </div>
+    </div>
+    <div class="ebv-banner ${statusClass}">
+      <div class="ebv-banner-icon">${isDeficit ? checkIcon : alertIcon}</div>
+      <div>
+        <div class="ebv-banner-text">${isDeficit
+          ? Math.abs(Math.round(net)) + ' kcal under today — nice work'
+          : Math.abs(Math.round(net)) + ' kcal over today'}</div>
+        <div class="ebv-banner-sub">${isDeficit
+          ? 'Keep this pace to stay on track'
+          : 'Still fine occasionally — just something to notice'}</div>
+      </div>
+    </div>
   `;
-  if (sub) sub.textContent = "Based on your profile, weigh-ins, and today's log.";
+  if (sub) sub.textContent = "Based on your profile, weigh-ins, and today's log — resting calories " + (hasManualBMR() ? "from your entry." : "estimated.");
 }
 
 function renderCalorieOtter() {
@@ -3436,6 +3531,7 @@ function setupForceRefresh() {
     }
   });
 }
+
 
 
 
