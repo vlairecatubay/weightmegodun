@@ -15,6 +15,7 @@
 
 
 
+
 <link rel="manifest" href="manifest.json" />
 <meta name="theme-color" content="#A29CF0" />
 <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png" />
@@ -35,7 +36,9 @@
 
 
 
+
 <style>
+
 
 
 
@@ -644,9 +647,11 @@ main{ display: block; margin-top: 4px; }
 
 
 
+
 </style>
 </head>
 <body>
+
 
 
 
@@ -1076,6 +1081,12 @@ main{ display: block; margin-top: 4px; }
             <input type="text" id="profile-height-in" inputmode="decimal" placeholder="2" autocomplete="off" />
           </div>
         </div>
+        <div class="field-row">
+          <div style="grid-column: 1 / -1;">
+            <label for="profile-resting-calories">Resting calories override (optional)</label>
+            <input type="text" id="profile-resting-calories" inputmode="decimal" placeholder="Leave blank to auto-estimate from your profile" autocomplete="off" />
+          </div>
+        </div>
         <div class="btn-row">
           <button type="button" class="primary" id="profile-save-btn">Save profile</button>
         </div>
@@ -1141,7 +1152,9 @@ main{ display: block; margin-top: 4px; }
 
 
 
+
 <script>
+
 
 
 
@@ -1210,7 +1223,7 @@ let state = {
   settings: {
     weightUnit: 'kg', measureUnit: 'cm', theme: 'vibrant', apiKey: '',
     calorieGoal: null, proteinGoal: null,
-    birthdate: null, sex: null, heightCm: null
+    birthdate: null, sex: null, heightCm: null, restingCalories: null
   },
   loaded: false
 };
@@ -1368,7 +1381,7 @@ function init() {
     state.calories = loadJSON(STORE.calories, []).sort((a, b) => a.date.localeCompare(b.date));
     state.exercise = loadJSON(STORE.exercise, []).sort((a, b) => a.date.localeCompare(b.date));
     state.chatHistory = loadJSON(STORE.chat, []);
-    state.settings = loadJSON(STORE.settings, { weightUnit: 'kg', measureUnit: 'cm', theme: 'vibrant', apiKey: '', calorieGoal: null, proteinGoal: null, birthdate: null, sex: null, heightCm: null });
+    state.settings = loadJSON(STORE.settings, { weightUnit: 'kg', measureUnit: 'cm', theme: 'vibrant', apiKey: '', calorieGoal: null, proteinGoal: null, birthdate: null, sex: null, heightCm: null, restingCalories: null });
     if (!state.settings.theme) state.settings.theme = 'vibrant';
     if (!state.settings.apiKey) state.settings.apiKey = '';
     // One-time pre-fill for this app's profile (only applies if nothing has
@@ -1920,7 +1933,7 @@ function importDataFromFile(file) {
     state.calories = calories.map(c => ({ ...c, id: c.id || uid() })).sort((a, b) => a.date.localeCompare(b.date));
     state.exercise = exercise.map(e => ({ ...e, id: e.id || uid() })).sort((a, b) => a.date.localeCompare(b.date));
     if (parsed.settings && typeof parsed.settings === 'object') {
-      state.settings = Object.assign({ weightUnit: 'kg', measureUnit: 'cm', theme: 'vibrant', calorieGoal: null, proteinGoal: null, birthdate: null, sex: null, heightCm: null }, parsed.settings);
+      state.settings = Object.assign({ weightUnit: 'kg', measureUnit: 'cm', theme: 'vibrant', calorieGoal: null, proteinGoal: null, birthdate: null, sex: null, heightCm: null, restingCalories: null }, parsed.settings);
     }
     // Backups never contain the API key (it's stripped on export) — keep whatever
     // key is already saved in this browser rather than wiping it on import.
@@ -1995,7 +2008,12 @@ function hasProfileForBMR() {
 }
 
 // Mifflin-St Jeor equation — widely used, reasonably accurate resting-metabolism estimate.
+function hasManualBMR() {
+  return Number(state.settings.restingCalories) > 0;
+}
+
 function calculateBMR() {
+  if (hasManualBMR()) return Math.round(Number(state.settings.restingCalories));
   if (!hasProfileForBMR()) return null;
   const weightKg = getLatestWeightKg();
   const heightCm = Number(state.settings.heightCm);
@@ -2082,7 +2100,7 @@ function renderEnergyBalance() {
     wrap.innerHTML = `<p class="empty-note" style="padding:6px 0;">
       ${missingWeight ? 'Log a weigh-in and complete' : 'Complete'} your
       <button type="button" class="link-btn" data-tab="settings">profile in Settings</button>
-      (birthdate, sex, height) to see your energy balance.
+      (birthdate, sex, height) — or just enter your resting calories directly there — to see your energy balance.
     </p>`;
     if (sub) sub.textContent = "How today's intake compares to what you've burned.";
     return;
@@ -2109,7 +2127,7 @@ function renderEnergyBalance() {
     <div class="energy-stats-row">
       <div class="energy-stat">
         <span class="energy-stat-num">${bmr}</span>
-        <span class="energy-stat-label">Resting burn (no exercise)</span>
+        <span class="energy-stat-label">Resting burn (no exercise) — ${hasManualBMR() ? 'your entry' : 'estimated'}</span>
       </div>
       <div class="energy-stat">
         <span class="energy-stat-num">${totalBurn}</span>
@@ -2884,6 +2902,9 @@ function populateProfileForm() {
     ftInput.value = '';
     inInput.value = '';
   }
+
+  const restingInput = document.getElementById('profile-resting-calories');
+  if (restingInput) restingInput.value = state.settings.restingCalories || '';
 }
 
 function setupProfileForm() {
@@ -2894,6 +2915,7 @@ function setupProfileForm() {
     const sexInput = document.getElementById('profile-sex');
     const ftInput = document.getElementById('profile-height-ft');
     const inInput = document.getElementById('profile-height-in');
+    const restingInput = document.getElementById('profile-resting-calories');
 
     const birthdate = birthdateInput.value || null;
     const sex = sexInput.value || null;
@@ -2902,10 +2924,13 @@ function setupProfileForm() {
     const heightCm = (!isNaN(feet) || !isNaN(inches))
       ? Math.round(((isNaN(feet) ? 0 : feet) * 12 + (isNaN(inches) ? 0 : inches)) * 2.54 * 100) / 100
       : null;
+    const restingCaloriesRaw = parseDecimal(restingInput.value);
+    const restingCalories = (!isNaN(restingCaloriesRaw) && restingCaloriesRaw > 0) ? Math.round(restingCaloriesRaw) : null;
 
     state.settings.birthdate = birthdate;
     state.settings.sex = sex;
     state.settings.heightCm = heightCm || null;
+    state.settings.restingCalories = restingCalories;
     saveJSON(STORE.settings, state.settings);
     renderEnergyBalance();
     flashStatus('profile-status', '✓ Profile saved');
@@ -3411,6 +3436,7 @@ function setupForceRefresh() {
     }
   });
 }
+
 
 
 
