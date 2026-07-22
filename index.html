@@ -19,6 +19,7 @@
 
 
 
+
 <link rel="manifest" href="manifest.json" />
 <meta name="theme-color" content="#A29CF0" />
 <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png" />
@@ -43,7 +44,9 @@
 
 
 
+
 <style>
+
 
 
 
@@ -695,9 +698,11 @@ main{ display: block; margin-top: 4px; }
 
 
 
+
 </style>
 </head>
 <body>
+
 
 
 
@@ -805,7 +810,7 @@ main{ display: block; margin-top: 4px; }
 
       <div class="card" id="pet-card">
         <p class="card-title">Your pet</p>
-        <p class="card-sub" id="pet-card-sub">Stays healthy while you stay on track.</p>
+        <p class="card-sub" id="pet-card-sub">Healthy on a 500+ kcal deficit day.</p>
         <div id="pet-display"></div>
       </div>
 
@@ -1210,7 +1215,9 @@ main{ display: block; margin-top: 4px; }
 
 
 
+
 <script>
+
 
 
 
@@ -2091,31 +2098,32 @@ function todaysExerciseCalories() {
 }
 
 // ---------- Virtual pet game ----------
-// "On track" for a given past day means: logged something that day, and stayed
-// within whichever of your calorie/protein goals are currently set. Uses today's
-// goal settings retroactively (the app doesn't store what your goal was on any
-// given past day, so this is a reasonable simplification).
-function hasAnyPetGoal() {
-  return Number(state.settings.calorieGoal) > 0 || Number(state.settings.proteinGoal) > 0;
+// "On track" for a given past day means: hit at least a 500 kcal deficit that
+// day (today's BMR/profile applied retroactively, plus that day's logged
+// exercise, versus that day's logged food — the app doesn't store what your
+// BMR was on any given past day, so this is a reasonable simplification, same
+// approach as the Energy balance card above).
+const PET_DEFICIT_TARGET = 500;
+
+function canTrackPet() {
+  return calculateBMR() !== null;
 }
 
 function isDayOnTrack(dateStr) {
-  const calGoal = Number(state.settings.calorieGoal);
-  const proteinGoal = Number(state.settings.proteinGoal);
-  const hasCalGoal = calGoal > 0;
-  const hasProteinGoal = proteinGoal > 0;
-  if (!hasCalGoal && !hasProteinGoal) return null;
+  const bmr = calculateBMR();
+  if (bmr === null) return null;
 
   const dayEntries = state.calories.filter(c => c.date === dateStr);
   if (dayEntries.length === 0) return false; // no logging that day counts as off track
 
-  const calTotal = dayEntries.reduce((sum, c) => sum + Number(c.calories), 0);
-  const proteinTotal = dayEntries.reduce((sum, c) => sum + Number(c.protein || 0), 0);
+  const dayExerciseBurned = state.exercise
+    .filter(e => e.date === dateStr)
+    .reduce((sum, e) => sum + Number(e.caloriesBurned), 0);
+  const totalBurn = bmr + dayExerciseBurned;
+  const consumed = dayEntries.reduce((sum, c) => sum + Number(c.calories), 0);
+  const deficit = totalBurn - consumed;
 
-  let ok = true;
-  if (hasCalGoal) ok = ok && calTotal <= calGoal;
-  if (hasProteinGoal) ok = ok && proteinTotal >= proteinGoal;
-  return ok;
+  return deficit >= PET_DEFICIT_TARGET;
 }
 
 // Looks back from yesterday (today is still in progress, so it isn't judged yet)
@@ -2152,10 +2160,11 @@ function computePetStreaks() {
 }
 
 function computePetStatus() {
-  if (!hasAnyPetGoal()) return { health: 'unknown', consecutiveBad: 0, consecutiveGood: 0 };
-  // First time the pet becomes active (goals just got set, or this is the very
-  // first render with goals already present from an import), give it a fresh
-  // start rather than judging it against days before it "existed".
+  if (!canTrackPet()) return { health: 'unknown', consecutiveBad: 0, consecutiveGood: 0 };
+  // First time the pet becomes active (profile just got completed, or this is
+  // the very first render with a profile already present from an import),
+  // give it a fresh start rather than judging it against days before it
+  // "existed".
   if (!state.settings.petLastRevivedDate) {
     state.settings.petLastRevivedDate = todayStr();
     saveJSON(STORE.settings, state.settings);
@@ -2223,11 +2232,14 @@ function renderPet() {
   const sub = document.getElementById('pet-card-sub');
   if (!wrap) return;
 
-  if (!hasAnyPetGoal()) {
+  if (!canTrackPet()) {
+    const missingWeight = getLatestWeightKg() === null;
     wrap.innerHTML = `<p class="empty-note" style="text-align:center; padding:10px 0;">
-      Set a calorie or protein goal in <button type="button" class="link-btn" data-tab="settings">Settings</button> to bring your pet to life.
+      ${missingWeight ? 'Log a weigh-in and complete' : 'Complete'} your
+      <button type="button" class="link-btn" data-tab="settings">profile in Settings</button>
+      (birthdate, sex, height) — or just enter your resting calories directly there — to bring your pet to life.
     </p>`;
-    if (sub) sub.textContent = 'Stays healthy while you stay on track.';
+    if (sub) sub.textContent = `Healthy on a ${PET_DEFICIT_TARGET}+ kcal deficit day.`;
     return;
   }
 
@@ -2237,13 +2249,13 @@ function renderPet() {
 
   let flavorHTML = '';
   if (status.health === 'healthy' && status.consecutiveGood > 0) {
-    flavorHTML = `<p class="pet-flavor">${status.consecutiveGood}-day on-track streak</p>`;
+    flavorHTML = `<p class="pet-flavor">${status.consecutiveGood}-day streak of ${PET_DEFICIT_TARGET}+ kcal deficits</p>`;
   } else if (status.health === 'healthy') {
-    flavorHTML = `<p class="pet-flavor">Stay on track to build a streak</p>`;
+    flavorHTML = `<p class="pet-flavor">Hit a ${PET_DEFICIT_TARGET}+ kcal deficit to start a streak</p>`;
   } else if (status.health !== 'dead') {
-    flavorHTML = `<p class="pet-flavor">${status.consecutiveBad} days off track — get back on track to help recovery</p>`;
+    flavorHTML = `<p class="pet-flavor">${status.consecutiveBad} days under a ${PET_DEFICIT_TARGET} kcal deficit — get back on track to help recovery</p>`;
   } else {
-    flavorHTML = `<p class="pet-flavor">${status.consecutiveBad} days off track in a row</p>`;
+    flavorHTML = `<p class="pet-flavor">${status.consecutiveBad} days in a row without a ${PET_DEFICIT_TARGET} kcal deficit</p>`;
   }
 
   const reviveButtonHTML = status.health === 'dead'
@@ -2256,7 +2268,7 @@ function renderPet() {
     ${flavorHTML}
     ${reviveButtonHTML}
   `;
-  if (sub) sub.textContent = 'Stays healthy while you stay on track.';
+  if (sub) sub.textContent = `Healthy on a ${PET_DEFICIT_TARGET}+ kcal deficit day.`;
 
   const reviveBtn = document.getElementById('pet-revive-btn');
   if (reviveBtn) {
@@ -3737,6 +3749,7 @@ function setupForceRefresh() {
     }
   });
 }
+
 
 
 
