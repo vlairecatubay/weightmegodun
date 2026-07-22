@@ -12,6 +12,9 @@
 
 
 
+
+
+
 <link rel="manifest" href="manifest.json" />
 <meta name="theme-color" content="#A29CF0" />
 <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png" />
@@ -29,7 +32,11 @@
 
 
 
+
+
+
 <style>
+
 
 
 
@@ -310,6 +317,25 @@ body{
 @media (max-width: 380px){
   .otter-grid{ grid-template-columns: 1fr; }
 }
+
+/* ---------- Energy balance card ---------- */
+.energy-stats-row{ display:grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
+.energy-stat{ display:flex; flex-direction: column; gap: 3px; }
+.energy-stat-num{ font-family:'Poppins', sans-serif; font-weight: 800; font-size: 21px; color: var(--ink); }
+.energy-stat-label{ font-size: 11px; color: var(--ink-faint); line-height: 1.3; }
+.energy-bars{ display:flex; flex-direction: column; gap: 10px; margin-bottom: 14px; }
+.energy-bar-row{ display:flex; align-items: center; gap: 10px; }
+.energy-bar-label{ font-size: 11.5px; font-weight: 600; color: var(--ink-soft); width: 62px; flex-shrink: 0; }
+.energy-bar-track{ flex: 1; height: 10px; border-radius: 6px; background: var(--bg); overflow: hidden; }
+.energy-bar-fill{ height: 100%; border-radius: 6px; transition: width .4s ease; }
+.energy-bar-fill.burned{ background: var(--positive); }
+.energy-bar-fill.consumed{ background: var(--coral-deep); }
+.energy-bar-value{ font-size: 11.5px; font-weight: 700; width: 46px; text-align: right; flex-shrink: 0; }
+.energy-net{ text-align:center; font-weight: 800; font-size: 13.5px; margin: 0; padding: 10px; border-radius: 12px; }
+.energy-net.deficit{ background: var(--positive-soft); color: var(--positive); }
+.energy-net.surplus{ background: var(--danger-soft); color: var(--danger); }
+.energy-net.neutral{ background: var(--bg); color: var(--ink-faint); font-weight: 600; }
+
 .nav-card{
   border-radius: 22px; padding: 18px; cursor: pointer; border: none; text-align: left;
   display:flex; flex-direction: column; gap: 26px; min-height: 128px; position: relative;
@@ -562,6 +588,9 @@ main{ display: block; margin-top: 4px; }
   font-weight: 600; border-radius: 18px; display:flex; flex-direction: column; gap: 4px;
   min-width: 180px;
 }
+.chat-bubble.logged.exercise{
+  background: var(--peach-soft); color: var(--warn);
+}
 .chat-item-row{
   display:flex; justify-content: space-between; gap: 10px; font-size: 12.5px; font-weight: 500;
 }
@@ -614,9 +643,11 @@ main{ display: block; margin-top: 4px; }
 
 
 
+
 </style>
 </head>
 <body>
+
 
 
 
@@ -710,6 +741,12 @@ main{ display: block; margin-top: 4px; }
           <p class="card-sub" id="otter-protein-sub">Set a goal in Settings.</p>
           <div id="otter-protein-display" class="otter-display"></div>
         </div>
+      </div>
+
+      <div class="card" id="energy-card">
+        <p class="card-title">Energy balance</p>
+        <p class="card-sub" id="energy-card-sub">How today's intake compares to what you've burned.</p>
+        <div id="energy-display"></div>
       </div>
 
       <div class="stat-card">
@@ -920,11 +957,39 @@ main{ display: block; margin-top: 4px; }
       </div>
 
       <div class="card">
+        <p class="card-title">Log exercise manually</p>
+        <p class="card-sub">Add a workout yourself — no AI key needed.</p>
+        <form class="entry-form" id="exercise-manual-form">
+          <div class="field-row">
+            <div>
+              <label for="exercise-date">Date</label>
+              <input type="date" id="exercise-date" />
+            </div>
+            <div>
+              <label for="exercise-description">Activity</label>
+              <input type="text" id="exercise-description" placeholder="e.g. 30 min run" autocomplete="off" />
+            </div>
+            <div>
+              <label for="exercise-value">Calories burned</label>
+              <input type="text" id="exercise-value" inputmode="decimal" placeholder="e.g. 250" autocomplete="off" />
+            </div>
+          </div>
+          <div class="btn-row">
+            <button type="button" class="primary" id="exercise-manual-submit-btn">Log exercise</button>
+            <span class="status-msg" id="exercise-manual-status"></span>
+          </div>
+        </form>
+      </div>
+
+      <div class="card">
         <div class="chat-header-row">
           <p class="card-title" style="margin:0;">Logged entries</p>
           <input type="date" id="calorie-log-date" style="width:auto; max-width:150px;" />
         </div>
-        <div id="chat-log-list" class="chat-log-list" style="margin-top:14px;"></div>
+        <p class="card-sub" style="margin:2px 0 0;">Food &amp; drink</p>
+        <div id="chat-log-list" class="chat-log-list" style="margin-top:10px;"></div>
+        <p class="card-sub" style="margin:18px 0 0;">Exercise</p>
+        <div id="exercise-log-list" class="chat-log-list" style="margin-top:10px;"></div>
       </div>
     </section>
 
@@ -945,6 +1010,10 @@ main{ display: block; margin-top: 4px; }
           <div class="data-summary-stat">
             <span class="data-summary-num" id="summary-calorie-count">0</span>
             <span class="data-summary-label">calorie logs</span>
+          </div>
+          <div class="data-summary-stat">
+            <span class="data-summary-num" id="summary-exercise-count">0</span>
+            <span class="data-summary-label">exercise logs</span>
           </div>
         </div>
         <div class="btn-row">
@@ -978,6 +1047,39 @@ main{ display: block; margin-top: 4px; }
         <div class="warning-box">
           Your key is stored only in this browser's local storage and is sent directly from your browser to Anthropic's API — never through any server of ours. Anyone with access to this browser could read it from developer tools. It's excluded from data exports, so it won't end up in a shared backup file. Remove it here any time.
         </div>
+      </div>
+
+      <div class="card">
+        <p class="card-title">Profile</p>
+        <p class="card-sub">Used to estimate your resting calorie burn (BMR). Your weight is pulled from your most recent weigh-in automatically.</p>
+        <div class="field-row">
+          <div>
+            <label for="profile-birthdate">Birthdate</label>
+            <input type="date" id="profile-birthdate" />
+          </div>
+          <div>
+            <label for="profile-sex">Sex</label>
+            <select id="profile-sex">
+              <option value="">Select…</option>
+              <option value="female">Female</option>
+              <option value="male">Male</option>
+            </select>
+          </div>
+        </div>
+        <div class="field-row">
+          <div>
+            <label for="profile-height-ft">Height — feet</label>
+            <input type="text" id="profile-height-ft" inputmode="decimal" placeholder="5" autocomplete="off" />
+          </div>
+          <div>
+            <label for="profile-height-in">Height — inches</label>
+            <input type="text" id="profile-height-in" inputmode="decimal" placeholder="2" autocomplete="off" />
+          </div>
+        </div>
+        <div class="btn-row">
+          <button type="button" class="primary" id="profile-save-btn">Save profile</button>
+        </div>
+        <span class="status-msg" id="profile-status" style="margin-top:12px; display:block;"></span>
       </div>
 
       <div class="card">
@@ -1025,9 +1127,10 @@ main{ display: block; margin-top: 4px; }
   <button class="tab-btn active" data-tab="dashboard">Overview</button>
   <button class="tab-btn" data-tab="weight">Weight</button>
   <button class="tab-btn" data-tab="measure">Measure</button>
-  <button class="tab-btn" data-tab="chat">Calories</button>
+  <button class="tab-btn" data-tab="chat">Fitness</button>
   <button class="tab-btn" data-tab="settings">Settings</button>
 </nav>
+
 
 
 
@@ -1051,6 +1154,7 @@ main{ display: block; margin-top: 4px; }
 
 
 
+
 // ---------- Storage helpers (browser localStorage) ----------
 const LS_PREFIX = 'weightmegodun:';
 const STORE = {
@@ -1058,6 +1162,7 @@ const STORE = {
   measure: 'measurement-entries',
   settings: 'settings',
   calories: 'calorie-entries',
+  exercise: 'exercise-entries',
   chat: 'chat-history'
 };
 
@@ -1100,8 +1205,13 @@ let state = {
   weights: [],
   measurements: [],
   calories: [],
+  exercise: [],
   chatHistory: [],
-  settings: { weightUnit: 'kg', measureUnit: 'cm', theme: 'vibrant', apiKey: '', calorieGoal: null, proteinGoal: null },
+  settings: {
+    weightUnit: 'kg', measureUnit: 'cm', theme: 'vibrant', apiKey: '',
+    calorieGoal: null, proteinGoal: null,
+    birthdate: null, sex: null, heightCm: null
+  },
   loaded: false
 };
 let lastKnownLevel = 1;
@@ -1256,10 +1366,19 @@ function init() {
     state.weights = loadJSON(STORE.weight, []).sort((a, b) => a.date.localeCompare(b.date));
     state.measurements = loadJSON(STORE.measure, []).sort((a, b) => a.date.localeCompare(b.date));
     state.calories = loadJSON(STORE.calories, []).sort((a, b) => a.date.localeCompare(b.date));
+    state.exercise = loadJSON(STORE.exercise, []).sort((a, b) => a.date.localeCompare(b.date));
     state.chatHistory = loadJSON(STORE.chat, []);
-    state.settings = loadJSON(STORE.settings, { weightUnit: 'kg', measureUnit: 'cm', theme: 'vibrant', apiKey: '', calorieGoal: null, proteinGoal: null });
+    state.settings = loadJSON(STORE.settings, { weightUnit: 'kg', measureUnit: 'cm', theme: 'vibrant', apiKey: '', calorieGoal: null, proteinGoal: null, birthdate: null, sex: null, heightCm: null });
     if (!state.settings.theme) state.settings.theme = 'vibrant';
     if (!state.settings.apiKey) state.settings.apiKey = '';
+    // One-time pre-fill for this app's profile (only applies if nothing has
+    // been set yet — never overwrites a value once it exists or is cleared).
+    if (!state.settings.birthdate && !state.settings.sex && !state.settings.heightCm) {
+      state.settings.birthdate = '1996-10-25';
+      state.settings.sex = 'female';
+      state.settings.heightCm = 157.48; // 5'2"
+      saveJSON(STORE.settings, state.settings);
+    }
     state.loaded = true;
 
     document.getElementById('weight-date').value = todayStr();
@@ -1268,8 +1387,9 @@ function init() {
     document.getElementById('measure-unit-select').value = state.settings.measureUnit;
     document.getElementById('calorie-date').value = todayStr();
     document.getElementById('calorie-log-date').value = todayStr();
-    if (state.settings.calorieGoal) document.getElementById('calorie-goal-input').value = state.settings.calorieGoal;
-    if (state.settings.proteinGoal) document.getElementById('protein-goal-input').value = state.settings.proteinGoal;
+    document.getElementById('exercise-date').value = todayStr();
+    populateGoalsForm();
+    populateProfileForm();
 
     lastKnownLevel = computeStats().level;
     applyTheme(state.settings.theme, false);
@@ -1311,6 +1431,7 @@ function renderAll() {
   renderDataSummary();
   renderCalorieToday();
   renderChatLogList();
+  renderExerciseLogList();
 }
 
 function renderHud() {
@@ -1714,9 +1835,11 @@ function renderDataSummary() {
   const weightEl = document.getElementById('summary-weight-count');
   const measureEl = document.getElementById('summary-measure-count');
   const calorieEl = document.getElementById('summary-calorie-count');
+  const exerciseEl = document.getElementById('summary-exercise-count');
   if (weightEl) weightEl.textContent = state.weights.length;
   if (measureEl) measureEl.textContent = state.measurements.length;
   if (calorieEl) calorieEl.textContent = state.calories.length;
+  if (exerciseEl) exerciseEl.textContent = state.exercise.length;
 }
 
 function exportData() {
@@ -1724,11 +1847,12 @@ function exportData() {
     const { apiKey, ...safeSettings } = state.settings;
     const payload = {
       app: 'WeightMeGodun',
-      version: 2,
+      version: 3,
       exportedAt: new Date().toISOString(),
       weights: state.weights,
       measurements: state.measurements,
       calories: state.calories,
+      exercise: state.exercise,
       settings: safeSettings
     };
     const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
@@ -1770,20 +1894,22 @@ function importDataFromFile(file) {
     const weights = parsed.weights;
     const measurements = parsed.measurements;
     const calories = parsed.calories || [];
+    const exercise = parsed.exercise || [];
     const weightsOk = isValidEntryArray(weights, ['value', 'unit']);
     const measurementsOk = isValidEntryArray(measurements, ['unit']);
     const caloriesOk = isValidEntryArray(calories, ['calories']);
+    const exerciseOk = isValidEntryArray(exercise, ['caloriesBurned']);
 
-    if (!weightsOk || !measurementsOk || !caloriesOk) {
+    if (!weightsOk || !measurementsOk || !caloriesOk || !exerciseOk) {
       flashStatus('data-status', '⚠ This file doesn\'t look like a WeightMeGodun backup', true);
       return;
     }
 
-    const hasExisting = state.weights.length > 0 || state.measurements.length > 0 || state.calories.length > 0;
+    const hasExisting = state.weights.length > 0 || state.measurements.length > 0 || state.calories.length > 0 || state.exercise.length > 0;
     if (hasExisting) {
       const proceed = confirm(
-        `This will replace your current data (${state.weights.length} weigh-ins, ${state.measurements.length} measurement sessions, ${state.calories.length} calorie logs) ` +
-        `with the backup (${weights.length} weigh-ins, ${measurements.length} measurement sessions, ${calories.length} calorie logs). Continue?`
+        `This will replace your current data (${state.weights.length} weigh-ins, ${state.measurements.length} measurement sessions, ${state.calories.length} calorie logs, ${state.exercise.length} exercise logs) ` +
+        `with the backup (${weights.length} weigh-ins, ${measurements.length} measurement sessions, ${calories.length} calorie logs, ${exercise.length} exercise logs). Continue?`
       );
       if (!proceed) return;
     }
@@ -1792,8 +1918,9 @@ function importDataFromFile(file) {
     state.weights = weights.map(w => ({ ...w, id: w.id || uid() })).sort((a, b) => a.date.localeCompare(b.date));
     state.measurements = measurements.map(m => ({ ...m, id: m.id || uid() })).sort((a, b) => a.date.localeCompare(b.date));
     state.calories = calories.map(c => ({ ...c, id: c.id || uid() })).sort((a, b) => a.date.localeCompare(b.date));
+    state.exercise = exercise.map(e => ({ ...e, id: e.id || uid() })).sort((a, b) => a.date.localeCompare(b.date));
     if (parsed.settings && typeof parsed.settings === 'object') {
-      state.settings = Object.assign({ weightUnit: 'kg', measureUnit: 'cm', theme: 'vibrant', calorieGoal: null, proteinGoal: null }, parsed.settings);
+      state.settings = Object.assign({ weightUnit: 'kg', measureUnit: 'cm', theme: 'vibrant', calorieGoal: null, proteinGoal: null, birthdate: null, sex: null, heightCm: null }, parsed.settings);
     }
     // Backups never contain the API key (it's stripped on export) — keep whatever
     // key is already saved in this browser rather than wiping it on import.
@@ -1802,17 +1929,20 @@ function importDataFromFile(file) {
     const wOk = saveJSON(STORE.weight, state.weights);
     const mOk = saveJSON(STORE.measure, state.measurements);
     const cOk = saveJSON(STORE.calories, state.calories);
+    const eOk = saveJSON(STORE.exercise, state.exercise);
     saveJSON(STORE.settings, state.settings);
 
     document.getElementById('weight-unit-select').value = state.settings.weightUnit;
     document.getElementById('measure-unit-select').value = state.settings.measureUnit;
+    populateGoalsForm();
+    populateProfileForm();
     applyTheme(state.settings.theme, false);
     renderThemeGrid();
     lastKnownLevel = computeStats().level;
     renderAll();
 
-    if (wOk && mOk && cOk) {
-      flashStatus('data-status', `✓ Restored ${weights.length} weigh-ins, ${measurements.length} measurement sessions, ${calories.length} calorie logs`);
+    if (wOk && mOk && cOk && eOk) {
+      flashStatus('data-status', `✓ Restored ${weights.length} weigh-ins, ${measurements.length} measurement sessions, ${calories.length} calorie logs, ${exercise.length} exercise logs`);
     } else {
       flashStatus('data-status', '⚠ Restored for this session, but local storage may not save it', true);
     }
@@ -1836,6 +1966,51 @@ function selectedLogDate() {
 
 function calorieEntriesForDate(date) {
   return state.calories.filter(c => c.date === date);
+}
+
+// ---------- Energy balance: BMR / TDEE ----------
+function getAge() {
+  const bd = state.settings.birthdate;
+  if (!bd) return null;
+  const birth = new Date(bd + 'T00:00:00');
+  if (isNaN(birth.getTime())) return null;
+  const today = new Date();
+  let age = today.getFullYear() - birth.getFullYear();
+  const monthDiff = today.getMonth() - birth.getMonth();
+  if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) age--;
+  return age >= 0 ? age : null;
+}
+
+function getLatestWeightKg() {
+  if (state.weights.length === 0) return null;
+  const sorted = [...state.weights].sort((a, b) => b.date.localeCompare(a.date));
+  const latest = sorted[0];
+  const value = Number(latest.value);
+  if (!isFinite(value) || value <= 0) return null;
+  return latest.unit === 'lb' ? value * 0.453592 : value;
+}
+
+function hasProfileForBMR() {
+  return getAge() !== null && getLatestWeightKg() !== null && Number(state.settings.heightCm) > 0 && !!state.settings.sex;
+}
+
+// Mifflin-St Jeor equation — widely used, reasonably accurate resting-metabolism estimate.
+function calculateBMR() {
+  if (!hasProfileForBMR()) return null;
+  const weightKg = getLatestWeightKg();
+  const heightCm = Number(state.settings.heightCm);
+  const age = getAge();
+  const base = 10 * weightKg + 6.25 * heightCm - 5 * age;
+  return Math.round(state.settings.sex === 'female' ? base - 161 : base + 5);
+}
+
+function todaysExerciseEntries() {
+  const today = todayStr();
+  return state.exercise.filter(e => e.date === today);
+}
+
+function todaysExerciseCalories() {
+  return todaysExerciseEntries().reduce((sum, e) => sum + Number(e.caloriesBurned), 0);
 }
 
 function sumMacros(entries) {
@@ -1895,6 +2070,68 @@ const OTTER_SAD_SVG = `
   <path d="M 102 130 Q 120 117 138 130" stroke="var(--ink)" stroke-width="5.5" fill="none" stroke-linecap="round"/>
   <path d="M 97 104 Q 92 114 97 122 Q 102 114 97 104 Z" fill="var(--danger)"/>
 </svg>`;
+
+function renderEnergyBalance() {
+  const wrap = document.getElementById('energy-display');
+  const sub = document.getElementById('energy-card-sub');
+  if (!wrap) return;
+
+  const bmr = calculateBMR();
+  if (bmr === null) {
+    const missingWeight = getLatestWeightKg() === null;
+    wrap.innerHTML = `<p class="empty-note" style="padding:6px 0;">
+      ${missingWeight ? 'Log a weigh-in and complete' : 'Complete'} your
+      <button type="button" class="link-btn" data-tab="settings">profile in Settings</button>
+      (birthdate, sex, height) to see your energy balance.
+    </p>`;
+    if (sub) sub.textContent = "How today's intake compares to what you've burned.";
+    return;
+  }
+
+  const exerciseBurned = todaysExerciseCalories();
+  const totalBurn = bmr + exerciseBurned;
+  const consumed = todaysCalorieEntries().reduce((sum, c) => sum + Number(c.calories), 0);
+
+  const maxScale = Math.max(totalBurn, consumed, 1);
+  const burnPct = Math.min(100, Math.round((totalBurn / maxScale) * 100));
+  const consumedPct = Math.min(100, Math.round((consumed / maxScale) * 100));
+
+  let netLineHTML = '<p class="energy-net neutral">Log today\'s meals to see your balance.</p>';
+  if (consumed > 0) {
+    const net = consumed - totalBurn; // negative = deficit, positive = surplus
+    const isDeficit = net <= 0;
+    netLineHTML = `<p class="energy-net ${isDeficit ? 'deficit' : 'surplus'}">
+      ${isDeficit ? '↓' : '↑'} ${Math.abs(Math.round(net))} kcal ${isDeficit ? 'deficit' : 'surplus'} today
+    </p>`;
+  }
+
+  wrap.innerHTML = `
+    <div class="energy-stats-row">
+      <div class="energy-stat">
+        <span class="energy-stat-num">${bmr}</span>
+        <span class="energy-stat-label">Resting burn (no exercise)</span>
+      </div>
+      <div class="energy-stat">
+        <span class="energy-stat-num">${totalBurn}</span>
+        <span class="energy-stat-label">With exercise today${exerciseBurned > 0 ? ' (+' + exerciseBurned + ')' : ''}</span>
+      </div>
+    </div>
+    <div class="energy-bars">
+      <div class="energy-bar-row">
+        <span class="energy-bar-label">Burned</span>
+        <div class="energy-bar-track"><div class="energy-bar-fill burned" style="width:${burnPct}%"></div></div>
+        <span class="energy-bar-value mono">${totalBurn}</span>
+      </div>
+      <div class="energy-bar-row">
+        <span class="energy-bar-label">Consumed</span>
+        <div class="energy-bar-track"><div class="energy-bar-fill consumed" style="width:${consumedPct}%"></div></div>
+        <span class="energy-bar-value mono">${consumed}</span>
+      </div>
+    </div>
+    ${netLineHTML}
+  `;
+  if (sub) sub.textContent = "Based on your profile, weigh-ins, and today's log.";
+}
 
 function renderCalorieOtter() {
   const wrap = document.getElementById('otter-calorie-display');
@@ -2007,9 +2244,99 @@ function renderCalorieToday() {
   if (chatMacrosEl) chatMacrosEl.textContent = macroLine;
   renderCalorieOtter();
   renderProteinOtter();
+  renderEnergyBalance();
 }
 
 let editingCalorieId = null;
+let editingExerciseId = null;
+
+function exerciseItemRowHTML(entry) {
+  return `
+    <div class="calorie-item-row" data-id="${entry.id}">
+      <div class="calorie-item-main">
+        <span class="history-value">${entry.description}</span>
+      </div>
+      <span class="mono" style="font-weight:700; color:var(--positive);">−${entry.caloriesBurned} kcal</span>
+      <button class="icon-btn edit-btn" data-id="${entry.id}" aria-label="Edit entry">✎</button>
+      <button class="icon-btn delete-btn" data-id="${entry.id}" aria-label="Delete entry">✕</button>
+    </div>
+  `;
+}
+
+function exerciseItemEditHTML(entry) {
+  return `
+    <div class="calorie-edit-row" data-id="${entry.id}">
+      <div class="field-row" style="margin-bottom:8px;">
+        <div>
+          <label>Activity</label>
+          <input type="text" class="edit-description" value="${(entry.description || '').replace(/"/g, '&quot;')}" />
+        </div>
+        <div>
+          <label>Calories burned</label>
+          <input type="text" inputmode="decimal" class="edit-calories" value="${entry.caloriesBurned}" />
+        </div>
+      </div>
+      <div class="btn-row" style="margin-top:0;">
+        <button type="button" class="primary edit-save-btn" data-id="${entry.id}" style="padding:8px 16px; font-size:12.5px;">Save</button>
+        <button type="button" class="secondary edit-cancel-btn" style="padding:8px 16px; font-size:12.5px;">Cancel</button>
+      </div>
+    </div>
+  `;
+}
+
+function renderExerciseLogList() {
+  const list = document.getElementById('exercise-log-list');
+  if (!list) return;
+  list.innerHTML = '';
+  const date = selectedLogDate();
+  const entries = state.exercise.filter(e => e.date === date);
+  if (entries.length === 0) {
+    list.innerHTML = '<p class="empty-note">No exercise logged on ' + fmtDate(date) + '.</p>';
+    return;
+  }
+
+  const dayTotal = entries.reduce((sum, e) => sum + Number(e.caloriesBurned), 0);
+  const totalRow = document.createElement('div');
+  totalRow.className = 'history-row';
+  totalRow.innerHTML = `<span class="history-value" style="font-weight:700;">Total burned</span><span class="mono" style="font-weight:800; color:var(--positive);">−${dayTotal} kcal</span>`;
+  list.appendChild(totalRow);
+
+  const groups = groupCalorieEntries(entries); // grouping logic is generic (by groupId), reused here
+  groups.forEach(group => {
+    const groupWrap = document.createElement('div');
+    groupWrap.className = 'calorie-group';
+    group.items.forEach(entry => {
+      const row = document.createElement('div');
+      row.innerHTML = entry.id === editingExerciseId ? exerciseItemEditHTML(entry) : exerciseItemRowHTML(entry);
+      const el = row.firstElementChild;
+      groupWrap.appendChild(el);
+
+      if (entry.id === editingExerciseId) {
+        el.querySelector('.edit-save-btn').addEventListener('click', () => {
+          const updates = {
+            description: el.querySelector('.edit-description').value,
+            caloriesBurned: parseDecimal(el.querySelector('.edit-calories').value)
+          };
+          editingExerciseId = null;
+          editExerciseEntry(entry.id, updates);
+        });
+        el.querySelector('.edit-cancel-btn').addEventListener('click', () => {
+          editingExerciseId = null;
+          renderExerciseLogList();
+        });
+      } else {
+        el.querySelector('.edit-btn').addEventListener('click', () => {
+          editingExerciseId = entry.id;
+          renderExerciseLogList();
+        });
+        el.querySelector('.delete-btn').addEventListener('click', () => deleteExerciseEntry(entry.id));
+      }
+    });
+    list.appendChild(groupWrap);
+  });
+}
+
+
 
 function groupCalorieEntries(entries) {
   const groups = new Map();
@@ -2191,13 +2518,37 @@ const CALORIE_TOOL = {
     required: ['items']
   }
 };
+const EXERCISE_TOOL = {
+  name: 'log_exercise',
+  description: "Log physical activity/exercise the person says they did, with an estimated calories burned. Call this whenever the message describes exercise or physical activity, even casually mentioned — break multiple distinct activities into separate items.",
+  input_schema: {
+    type: 'object',
+    properties: {
+      items: {
+        type: 'array',
+        description: 'One entry per distinct activity mentioned in the message.',
+        items: {
+          type: 'object',
+          properties: {
+            name: { type: 'string', description: 'Short name of the activity, e.g. "30 min run" or "Yoga session".' },
+            caloriesBurned: { type: 'number', description: 'Best-estimate calories burned for this activity, considering typical duration/intensity if mentioned.' }
+          },
+          required: ['name', 'caloriesBurned']
+        }
+      }
+    },
+    required: ['items']
+  }
+};
 
-const CHAT_SYSTEM_PROMPT = "You are a friendly nutrition assistant inside a personal health-tracking app called WeightMeGodun. " +
-  "When the person describes food or drink they've consumed, break it down into its distinct items (e.g. \"burger and fries and a coke\" " +
-  "is three items, not one) and call the log_food_items tool with a best-estimate calorie and macro (protein/carbs/fat in grams) " +
-  "breakdown for each item, using general nutrition knowledge — don't ask clarifying questions first, just give your best estimate " +
-  "and note any assumptions briefly in your reply. If the message isn't about food (a question, greeting, etc.), just reply " +
-  "conversationally without calling the tool. Keep replies brief, warm, and to the point — one or two sentences.";
+const CHAT_SYSTEM_PROMPT = "You are a friendly health assistant inside a personal tracking app called WeightMeGodun. You handle two kinds of logging. " +
+  "(1) Food or drink: break it down into its distinct items (e.g. \"burger and fries and a coke\" is three items, not one) and call " +
+  "log_food_items with a best-estimate calorie and macro (protein/carbs/fat in grams) breakdown for each item. " +
+  "(2) Exercise or physical activity: call log_exercise with a best-estimate calories burned for each distinct activity mentioned. " +
+  "A single message can include both (e.g. \"ran 5k then had a protein shake\" — call both tools). Use general nutrition/fitness knowledge " +
+  "for estimates — don't ask clarifying questions first, just give your best estimate and note any assumptions briefly in your reply. " +
+  "If the message isn't about food or exercise (a question, greeting, etc.), just reply conversationally without calling either tool. " +
+  "Keep replies brief, warm, and to the point — one or two sentences.";
 
 async function fetchWithTimeout(url, options, ms) {
   const controller = new AbortController();
@@ -2223,11 +2574,15 @@ function renderChatWindow() {
       bubble.className = 'chat-bubble user';
       bubble.textContent = msg.text;
     } else if (msg.role === 'logged') {
-      bubble.className = 'chat-bubble logged';
+      const isExercise = msg.kind === 'exercise';
+      bubble.className = 'chat-bubble logged' + (isExercise ? ' exercise' : '');
       const items = msg.items || [];
       const names = items.map(it => it.description).join(', ');
+      const headline = isExercise
+        ? `🔥 Logged — ${msg.calories} kcal burned`
+        : `✓ Logged — ${msg.calories} kcal total`;
       bubble.innerHTML = `
-        <div class="chat-item-row" style="font-weight:800;"><span>✓ Logged — ${msg.calories} kcal total</span></div>
+        <div class="chat-item-row" style="font-weight:800;"><span>${headline}</span></div>
         <div class="chat-item-row" style="font-weight:500; opacity:0.85;"><span>${names}</span></div>
         <div class="chat-item-row" style="font-weight:500; opacity:0.7; font-size:11px;"><span>See full breakdown, edit, or delete in the log below ↓</span></div>
       `;
@@ -2298,10 +2653,10 @@ async function sendChatMessage(text) {
       },
       body: JSON.stringify({
         model: 'claude-haiku-4-5-20251001',
-        max_tokens: 400,
+        max_tokens: 500,
         system: CHAT_SYSTEM_PROMPT,
         messages: history,
-        tools: [CALORIE_TOOL]
+        tools: [CALORIE_TOOL, EXERCISE_TOOL]
       })
     }, 30000);
 
@@ -2321,18 +2676,32 @@ async function sendChatMessage(text) {
     const data = await res.json();
     const blocks = data.content || [];
     const textParts = blocks.filter(b => b.type === 'text').map(b => b.text).join(' ').trim();
-    const toolUse = blocks.find(b => b.type === 'tool_use' && b.name === 'log_food_items');
+    const foodCall = blocks.find(b => b.type === 'tool_use' && b.name === 'log_food_items');
+    const exerciseCall = blocks.find(b => b.type === 'tool_use' && b.name === 'log_exercise');
 
     if (textParts) {
       pushChatMessage({ role: 'assistant', text: textParts });
     }
 
-    const items = toolUse && toolUse.input && Array.isArray(toolUse.input.items) ? toolUse.input.items : null;
-    if (items && items.length > 0) {
-      const logged = addCalorieItems(todayStr(), items);
+    let loggedSomething = false;
+
+    const foodItems = foodCall && foodCall.input && Array.isArray(foodCall.input.items) ? foodCall.input.items : null;
+    if (foodItems && foodItems.length > 0) {
+      const logged = addCalorieItems(todayStr(), foodItems);
       const total = logged.reduce((sum, e) => sum + e.calories, 0);
-      pushChatMessage({ role: 'logged', calories: total, items: logged });
-    } else if (!textParts) {
+      pushChatMessage({ role: 'logged', kind: 'food', calories: total, items: logged });
+      loggedSomething = true;
+    }
+
+    const exerciseItems = exerciseCall && exerciseCall.input && Array.isArray(exerciseCall.input.items) ? exerciseCall.input.items : null;
+    if (exerciseItems && exerciseItems.length > 0) {
+      const loggedEx = addExerciseItems(todayStr(), exerciseItems);
+      const totalBurned = loggedEx.reduce((sum, e) => sum + e.caloriesBurned, 0);
+      pushChatMessage({ role: 'logged', kind: 'exercise', calories: totalBurned, items: loggedEx });
+      loggedSomething = true;
+    }
+
+    if (!loggedSomething && !textParts) {
       pushChatMessage({ role: 'assistant', text: "Got it, but I didn't catch anything to log there." });
     }
   } catch (err) {
@@ -2453,8 +2822,94 @@ function setupCalorieManualForm() {
   const manualForm = document.getElementById('calorie-manual-form');
   if (manualForm) manualForm.addEventListener('submit', e => { e.preventDefault(); submitManual(); });
   if (logDatePicker) {
-    logDatePicker.addEventListener('change', () => renderChatLogList());
+    logDatePicker.addEventListener('change', () => { renderChatLogList(); renderExerciseLogList(); });
   }
+}
+
+function setupExerciseManualForm() {
+  const dateInput = document.getElementById('exercise-date');
+  const descInput = document.getElementById('exercise-description');
+  const valueInput = document.getElementById('exercise-value');
+  const submitBtn = document.getElementById('exercise-manual-submit-btn');
+  const logDatePicker = document.getElementById('calorie-log-date');
+
+  function submitManual() {
+    const date = (dateInput.value || todayStr());
+    const caloriesBurned = parseDecimal(valueInput.value);
+    if (isNaN(caloriesBurned) || caloriesBurned <= 0) {
+      flashStatus('exercise-manual-status', '⚠ Enter calories burned to log this entry', true);
+      return;
+    }
+    const description = (descInput.value || '').trim() || 'Exercise';
+    addExerciseEntry(date, description, caloriesBurned);
+    descInput.value = '';
+    valueInput.value = '';
+    flashStatus('exercise-manual-status', '✓ Logged ' + Math.round(caloriesBurned) + ' kcal burned on ' + fmtDate(date));
+    if (logDatePicker) {
+      logDatePicker.value = date;
+      renderExerciseLogList();
+    }
+  }
+
+  if (submitBtn) submitBtn.addEventListener('click', submitManual);
+  const manualForm = document.getElementById('exercise-manual-form');
+  if (manualForm) manualForm.addEventListener('submit', e => { e.preventDefault(); submitManual(); });
+}
+
+function populateGoalsForm() {
+  const calInput = document.getElementById('calorie-goal-input');
+  const proteinInput = document.getElementById('protein-goal-input');
+  if (calInput) calInput.value = state.settings.calorieGoal || '';
+  if (proteinInput) proteinInput.value = state.settings.proteinGoal || '';
+}
+
+function populateProfileForm() {
+  const birthdateInput = document.getElementById('profile-birthdate');
+  const sexInput = document.getElementById('profile-sex');
+  const ftInput = document.getElementById('profile-height-ft');
+  const inInput = document.getElementById('profile-height-in');
+  if (!birthdateInput) return;
+
+  birthdateInput.value = state.settings.birthdate || '';
+  sexInput.value = state.settings.sex || '';
+
+  const heightCm = Number(state.settings.heightCm);
+  if (heightCm > 0) {
+    const totalInches = heightCm / 2.54;
+    const feet = Math.floor(totalInches / 12);
+    const inches = Math.round(totalInches - feet * 12);
+    ftInput.value = feet;
+    inInput.value = inches;
+  } else {
+    ftInput.value = '';
+    inInput.value = '';
+  }
+}
+
+function setupProfileForm() {
+  const saveBtn = document.getElementById('profile-save-btn');
+  if (!saveBtn) return;
+  saveBtn.addEventListener('click', () => {
+    const birthdateInput = document.getElementById('profile-birthdate');
+    const sexInput = document.getElementById('profile-sex');
+    const ftInput = document.getElementById('profile-height-ft');
+    const inInput = document.getElementById('profile-height-in');
+
+    const birthdate = birthdateInput.value || null;
+    const sex = sexInput.value || null;
+    const feet = parseDecimal(ftInput.value);
+    const inches = parseDecimal(inInput.value);
+    const heightCm = (!isNaN(feet) || !isNaN(inches))
+      ? Math.round(((isNaN(feet) ? 0 : feet) * 12 + (isNaN(inches) ? 0 : inches)) * 2.54 * 100) / 100
+      : null;
+
+    state.settings.birthdate = birthdate;
+    state.settings.sex = sex;
+    state.settings.heightCm = heightCm || null;
+    saveJSON(STORE.settings, state.settings);
+    renderEnergyBalance();
+    flashStatus('profile-status', '✓ Profile saved');
+  });
 }
 
 // ---------- CRUD ----------
@@ -2576,6 +3031,70 @@ function deleteCalorieGroup(groupId) {
   saveJSON(STORE.calories, state.calories);
   renderCalorieToday();
   renderChatLogList();
+  renderDataSummary();
+}
+
+// ---------- Exercise CRUD ----------
+function addExerciseEntry(date, description, caloriesBurned, groupId) {
+  const entry = {
+    id: uid(),
+    groupId: groupId || uid(),
+    date,
+    description,
+    caloriesBurned: Math.round(Number(caloriesBurned) || 0),
+    loggedAt: new Date().toISOString()
+  };
+  state.exercise.push(entry);
+  state.exercise.sort((a, b) => a.date.localeCompare(b.date));
+  saveJSON(STORE.exercise, state.exercise);
+  renderCalorieToday(); // energy balance depends on exercise too
+  renderExerciseLogList();
+  renderDataSummary();
+  return entry;
+}
+
+function addExerciseItems(date, items) {
+  const groupId = uid();
+  const entries = items.map(item => {
+    const entry = {
+      id: uid(),
+      groupId,
+      date,
+      description: item.name || item.description || 'Exercise',
+      caloriesBurned: Math.round(Number(item.caloriesBurned) || 0),
+      loggedAt: new Date().toISOString()
+    };
+    state.exercise.push(entry);
+    return entry;
+  });
+  state.exercise.sort((a, b) => a.date.localeCompare(b.date));
+  saveJSON(STORE.exercise, state.exercise);
+  renderCalorieToday();
+  renderExerciseLogList();
+  renderDataSummary();
+  return entries;
+}
+
+function editExerciseEntry(id, updates) {
+  const idx = state.exercise.findIndex(e => e.id === id);
+  if (idx === -1) return;
+  const existing = state.exercise[idx];
+  state.exercise[idx] = {
+    ...existing,
+    description: (updates.description || '').trim() || existing.description,
+    caloriesBurned: Math.round(Number(updates.caloriesBurned)) || 0
+  };
+  saveJSON(STORE.exercise, state.exercise);
+  renderCalorieToday();
+  renderExerciseLogList();
+  renderDataSummary();
+}
+
+function deleteExerciseEntry(id) {
+  state.exercise = state.exercise.filter(e => e.id !== id);
+  saveJSON(STORE.exercise, state.exercise);
+  renderCalorieToday();
+  renderExerciseLogList();
   renderDataSummary();
 }
 
@@ -2717,15 +3236,17 @@ function setupForms() {
   document.getElementById('measure-form').addEventListener('submit', e => { e.preventDefault(); submitMeasurement(); });
 
   document.getElementById('reset-data-btn').addEventListener('click', () => {
-    if (!confirm('This clears all logged weight, measurement, and calorie data plus chat history on this device (your saved API key is kept). Continue?')) return;
+    if (!confirm('This clears all logged weight, measurement, calorie, and exercise data plus chat history on this device (your saved API key and profile are kept). Continue?')) return;
     state.weights = [];
     state.measurements = [];
     state.calories = [];
+    state.exercise = [];
     state.chatHistory = [];
     lastKnownLevel = 1;
     saveJSON(STORE.weight, []);
     saveJSON(STORE.measure, []);
     saveJSON(STORE.calories, []);
+    saveJSON(STORE.exercise, []);
     saveJSON(STORE.chat, []);
     renderChatWindow();
     renderAll();
@@ -2779,6 +3300,8 @@ document.addEventListener('DOMContentLoaded', () => {
   safeCall(setupForms, 'forms');
   safeCall(setupSettings, 'settings');
   safeCall(setupCalorieManualForm, 'calorie manual form');
+  safeCall(setupExerciseManualForm, 'exercise manual form');
+  safeCall(setupProfileForm, 'profile form');
   safeCall(setupInstallButton, 'install button');
   safeCall(setupGoalsForm, 'goals form');
   safeCall(setupForceRefresh, 'force refresh button');
@@ -2888,6 +3411,7 @@ function setupForceRefresh() {
     }
   });
 }
+
 
 
 
