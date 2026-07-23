@@ -21,6 +21,8 @@
 
 
 
+
+
 <link rel="manifest" href="manifest.json" />
 <meta name="theme-color" content="#A29CF0" />
 <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png" />
@@ -47,7 +49,10 @@
 
 
 
+
+
 <style>
+
 
 
 
@@ -380,15 +385,70 @@ body{
 .ebv-banner-sub{ font-size:10.5px; color:rgba(255,255,255,0.8); margin-top:1px; font-weight:500; }
 .ebv-banner.neutral .ebv-banner-sub{ color: var(--ink-faint); }
 
-/* ---------- Pet game card ---------- */
+/* ---------- Character card (chibi, pure CSS, weight-driven proportions) ---------- */
 #pet-display{ display:flex; flex-direction:column; align-items:center; text-align:center; padding: 6px 0 2px; }
-.pet-stage{ margin-bottom: 8px; }
-.pet-status{ font-family:'Poppins', sans-serif; font-weight:700; font-size:15px; margin:0; }
-.pet-status-healthy{ color: var(--positive); }
-.pet-status-slight{ color: var(--warn); }
-.pet-status-severe{ color: var(--danger); }
-.pet-status-dead{ color: var(--ink-faint); }
-.pet-flavor{ font-size:12px; color:var(--ink-faint); margin:5px 0 0; max-width: 240px; }
+.chibi-stage{ width: 100%; display:flex; justify-content:center; margin-bottom: 6px; }
+
+.chibi{
+  --torso-w: 96px; --limb-w: 20px; --leg-w: 22px;
+  position:relative; width:220px; height:266px; flex-shrink:0;
+  transition: --torso-w .5s ease; /* no-op in browsers without var transitions, harmless */
+}
+.chibi-hair-back{
+  width:132px; height:150px; border-radius: 66px 66px 46px 46px;
+  background:#221B1B; position:absolute; top:18px; left:44px; z-index:1;
+}
+.chibi-ear{ width:14px; height:20px; border-radius:50%; background:#F0C29C; position:absolute; top:60px; z-index:1; }
+.chibi-ear.left{ left:52px; }
+.chibi-ear.right{ left:154px; }
+.chibi-head{
+  width:108px; height:108px; border-radius:50%;
+  background:#F0C29C; position:absolute; top:14px; left:56px; z-index:2;
+}
+.chibi-hair-front{
+  width:112px; height:42px; border-radius: 60px 60px 6px 6px;
+  background:#221B1B; position:absolute; top:12px; left:54px; z-index:3;
+}
+.chibi-eye{ width:19px; height:8px; background:#2B2118; border-radius:50%; position:absolute; top:65px; z-index:4; }
+.chibi-eye.left{ left:78px; transform:rotate(-6deg); }
+.chibi-eye.right{ left:122px; transform:rotate(6deg); }
+.chibi-cheek{ width:13px; height:7px; border-radius:50%; background:#F0958A; opacity:0.55; position:absolute; top:80px; z-index:3; }
+.chibi-cheek.left{ left:68px; }
+.chibi-cheek.right{ left:138px; }
+.chibi-mouth{
+  width:10px; height:5px; border:2px solid #7A4A34; border-top:none; border-radius:0 0 10px 10px;
+  position:absolute; top:92px; left:105px; z-index:4;
+}
+.chibi-neck{ width:22px; height:16px; background:#E0AD82; position:absolute; top:118px; left:99px; z-index:1; }
+
+.chibi-torso{
+  width: var(--torso-w); height:76px; border-radius:28px 28px 18px 18px;
+  background: var(--periwinkle); position:absolute; top:130px;
+  left:calc(50% - (var(--torso-w) / 2)); z-index:2;
+}
+.chibi-collar{
+  width:28px; height:14px; border-radius:0 0 14px 14px; background: var(--hero-end);
+  position:absolute; top:130px; left:calc(50% - 14px); z-index:3;
+}
+.chibi-arm{
+  width: var(--limb-w); height:58px; border-radius:10px; background: var(--periwinkle);
+  position:absolute; top:136px; z-index:1; transform-origin: top center;
+}
+.chibi-arm.left{ left:calc(50% - (var(--torso-w) / 2) - (var(--limb-w) * 0.6)); transform:rotate(9deg); }
+.chibi-arm.right{ left:calc(50% + (var(--torso-w) / 2) - (var(--limb-w) * 0.4)); transform:rotate(-9deg); }
+.chibi-hand{ width:16px; height:16px; border-radius:50%; background:#F0C29C; position:absolute; top:188px; z-index:1; }
+.chibi-hand.left{ left:calc(50% - (var(--torso-w) / 2) - (var(--limb-w) * 0.6) - 3px); }
+.chibi-hand.right{ left:calc(50% + (var(--torso-w) / 2) - (var(--limb-w) * 0.4) - 3px); }
+
+.chibi-leg{ width: var(--leg-w); height:50px; border-radius:8px; background:#3B3550; position:absolute; top:200px; z-index:1; }
+.chibi-leg.left{ left:calc(50% - var(--leg-w) - 4px); }
+.chibi-leg.right{ left:calc(50% + 4px); }
+.chibi-shoe{ width:24px; height:13px; border-radius:7px; background:#221B1B; position:absolute; top:243px; z-index:2; }
+.chibi-shoe.left{ left:calc(50% - var(--leg-w) - 8px); }
+.chibi-shoe.right{ left:calc(50% + 1px); }
+
+.pet-status{ font-family:'Poppins', sans-serif; font-weight:700; font-size:15px; margin:0; color: var(--ink); }
+.pet-flavor{ font-size:12px; color:var(--ink-faint); margin:5px 0 0; max-width: 260px; }
 
 .nav-card{
   border-radius: 22px; padding: 18px; cursor: pointer; border: none; text-align: left;
@@ -703,9 +763,11 @@ main{ display: block; margin-top: 4px; }
 
 
 
+
 </style>
 </head>
 <body>
+
 
 
 
@@ -814,9 +876,30 @@ main{ display: block; margin-top: 4px; }
       </div>
 
       <div class="card" id="pet-card">
-        <p class="card-title">Your pet</p>
-        <p class="card-sub" id="pet-card-sub">Healthy on a 500+ kcal deficit day.</p>
-        <div id="pet-display"></div>
+        <p class="card-title">Your character</p>
+        <p class="card-sub" id="pet-card-sub">Mirrors your weight as you progress.</p>
+        <div id="pet-display">
+          <div class="chibi-stage">
+            <div class="chibi" id="chibi-figure">
+              <div class="chibi-hair-back"></div>
+              <div class="chibi-ear left"></div><div class="chibi-ear right"></div>
+              <div class="chibi-head"></div>
+              <div class="chibi-hair-front"></div>
+              <div class="chibi-eye left"></div><div class="chibi-eye right"></div>
+              <div class="chibi-cheek left"></div><div class="chibi-cheek right"></div>
+              <div class="chibi-mouth"></div>
+              <div class="chibi-neck"></div>
+              <div class="chibi-arm left"></div><div class="chibi-arm right"></div>
+              <div class="chibi-hand left"></div><div class="chibi-hand right"></div>
+              <div class="chibi-torso"></div>
+              <div class="chibi-collar"></div>
+              <div class="chibi-leg left"></div><div class="chibi-leg right"></div>
+              <div class="chibi-shoe left"></div><div class="chibi-shoe right"></div>
+            </div>
+          </div>
+          <p class="pet-status" id="pet-status-text"></p>
+          <p class="pet-flavor" id="pet-flavor-text"></p>
+        </div>
       </div>
 
       <div class="stat-card">
@@ -1222,7 +1305,9 @@ main{ display: block; margin-top: 4px; }
 
 
 
+
 <script>
+
 
 
 
@@ -2104,187 +2189,79 @@ function todaysExerciseCalories() {
   return todaysExerciseEntries().reduce((sum, e) => sum + Number(e.caloriesBurned), 0);
 }
 
-// ---------- Virtual pet game ----------
-// "On track" for a given past day means: hit at least a 500 kcal deficit that
-// day (today's BMR/profile applied retroactively, plus that day's logged
-// exercise, versus that day's logged food — the app doesn't store what your
-// BMR was on any given past day, so this is a reasonable simplification, same
-// approach as the Energy balance card above).
-const PET_DEFICIT_TARGET = 500;
+// ---------- Character: reflects your weight progress ----------
+// Compares your most recent weigh-in against your very first logged weight.
+// Losing weight since then slims the character down; gaining weight since
+// then makes it bigger — a direct visualization of "current weight" rather
+// than an abstract streak.
+const CHAR_MIN_PCT = -0.15; // 15% below starting weight = slimmest look
+const CHAR_MAX_PCT = 0.15;  // 15% above starting weight = largest look
 
-function canTrackPet() {
-  return calculateBMR() !== null;
+function weightKgOf(entry) {
+  const value = Number(entry.value);
+  if (!isFinite(value) || value <= 0) return null;
+  return entry.unit === 'lb' ? value * 0.453592 : value;
 }
 
-function isDayOnTrack(dateStr) {
-  const bmr = calculateBMR();
-  if (bmr === null) return null;
-
-  const dayEntries = state.calories.filter(c => c.date === dateStr);
-  if (dayEntries.length === 0) return false; // no logging that day counts as off track
-
-  const dayExerciseBurned = state.exercise
-    .filter(e => e.date === dateStr)
-    .reduce((sum, e) => sum + Number(e.caloriesBurned), 0);
-  const totalBurn = bmr + dayExerciseBurned;
-  const consumed = dayEntries.reduce((sum, c) => sum + Number(c.calories), 0);
-  const deficit = totalBurn - consumed;
-
-  return deficit >= PET_DEFICIT_TARGET;
+function computeCharacterProgress() {
+  if (state.weights.length === 0) return null;
+  const sorted = [...state.weights].sort((a, b) => a.date.localeCompare(b.date));
+  const startKg = weightKgOf(sorted[0]);
+  const currentKg = weightKgOf(sorted[sorted.length - 1]);
+  if (!startKg || !currentKg) return null;
+  if (sorted.length === 1) return { pct: 0, startKg, currentKg, singleEntry: true };
+  const pct = (currentKg - startKg) / startKg; // negative = lost weight, positive = gained
+  return { pct, startKg, currentKg, singleEntry: false };
 }
-
-// Looks back from yesterday (today is still in progress, so it isn't judged yet)
-// and counts the current consecutive streak — either a run of off-track days or
-// a run of on-track days, whichever is currently active.
-function computePetStreaks() {
-  const revivedDate = state.settings.petLastRevivedDate;
-  const cursor = new Date();
-  cursor.setDate(cursor.getDate() - 1);
-
-  let consecutiveBad = 0;
-  let consecutiveGood = 0;
-  let mode = null;
-
-  for (let i = 0; i < 30; i++) {
-    const dateStr = cursor.toISOString().slice(0, 10);
-    if (revivedDate && dateStr < revivedDate) break;
-
-    const onTrack = isDayOnTrack(dateStr);
-    if (onTrack === null) break;
-
-    if (mode === null) mode = onTrack ? 'good' : 'bad';
-    if (mode === 'bad') {
-      if (onTrack) break;
-      consecutiveBad++;
-    } else {
-      if (!onTrack) break;
-      consecutiveGood++;
-    }
-    cursor.setDate(cursor.getDate() - 1);
-  }
-
-  return { consecutiveBad, consecutiveGood };
-}
-
-function computePetStatus() {
-  if (!canTrackPet()) return { health: 'unknown', consecutiveBad: 0, consecutiveGood: 0 };
-  // First time the pet becomes active (profile just got completed, or this is
-  // the very first render with a profile already present from an import),
-  // give it a fresh start rather than judging it against days before it
-  // "existed".
-  if (!state.settings.petLastRevivedDate) {
-    state.settings.petLastRevivedDate = todayStr();
-    saveJSON(STORE.settings, state.settings);
-  }
-  const { consecutiveBad, consecutiveGood } = computePetStreaks();
-  let health;
-  if (consecutiveBad > 7) health = 'dead';
-  else if (consecutiveBad >= 5) health = 'severe';
-  else if (consecutiveBad >= 3) health = 'slight';
-  else health = 'healthy';
-  return { health, consecutiveBad, consecutiveGood };
-}
-
-const PET_HEALTHY_SVG = `
-<svg viewBox="0 0 200 200" width="150" height="150" role="img" aria-label="Healthy pet">
-  <ellipse cx="100" cy="180" rx="46" ry="8" fill="rgba(0,0,0,0.06)"/>
-  <path d="M60 96 Q56 60 100 56 Q144 60 140 96 Q142 140 100 150 Q58 140 60 96 Z" fill="var(--periwinkle)"/>
-  <path d="M96 56 Q92 40 78 36 Q88 30 100 38 Q104 46 96 56 Z" fill="var(--sage)"/>
-  <circle cx="80" cy="92" r="14" fill="#fff"/>
-  <circle cx="120" cy="92" r="14" fill="#fff"/>
-  <circle cx="82" cy="94" r="7" fill="var(--ink)"/>
-  <circle cx="122" cy="94" r="7" fill="var(--ink)"/>
-  <circle cx="70" cy="112" r="8" fill="var(--positive)" opacity="0.35"/>
-  <circle cx="130" cy="112" r="8" fill="var(--positive)" opacity="0.35"/>
-  <path d="M82 118 Q100 132 118 118" stroke="var(--ink)" stroke-width="4" fill="none" stroke-linecap="round"/>
-</svg>`;
-
-const PET_SLIGHT_SVG = `
-<svg viewBox="0 0 200 200" width="150" height="150" role="img" aria-label="Slightly sick pet">
-  <ellipse cx="100" cy="180" rx="46" ry="8" fill="rgba(0,0,0,0.06)"/>
-  <path d="M62 98 Q58 62 100 58 Q142 62 138 98 Q140 140 100 149 Q60 140 62 98 Z" fill="var(--periwinkle-soft)"/>
-  <path d="M96 58 Q94 46 84 44 Q92 40 100 46 Q102 52 96 58 Z" fill="var(--sage)" opacity="0.7"/>
-  <path d="M70 92 Q80 88 90 92" stroke="var(--ink)" stroke-width="4" fill="none" stroke-linecap="round"/>
-  <path d="M110 92 Q120 88 130 92" stroke="var(--ink)" stroke-width="4" fill="none" stroke-linecap="round"/>
-  <circle cx="80" cy="98" r="5" fill="var(--ink)"/>
-  <circle cx="120" cy="98" r="5" fill="var(--ink)"/>
-  <path d="M85 122 Q100 116 115 122" stroke="var(--ink)" stroke-width="4" fill="none" stroke-linecap="round"/>
-  <path d="M135 78 q6 6 0 12" stroke="var(--teal)" stroke-width="3" fill="none" stroke-linecap="round"/>
-</svg>`;
-
-const PET_SEVERE_SVG = `
-<svg viewBox="0 0 200 200" width="150" height="150" role="img" aria-label="Severely sick pet">
-  <ellipse cx="100" cy="182" rx="50" ry="7" fill="rgba(0,0,0,0.06)"/>
-  <path d="M58 104 Q56 70 100 66 Q144 70 142 104 Q146 142 100 148 Q54 142 58 104 Z" fill="var(--ink-faint)"/>
-  <path d="M96 66 Q98 54 90 50 Q96 46 102 52 Q104 58 96 66 Z" fill="var(--warn)" opacity="0.6"/>
-  <path d="M68 96 L84 104 M84 96 L68 104" stroke="var(--ink)" stroke-width="4" stroke-linecap="round"/>
-  <path d="M116 96 L132 104 M132 96 L116 104" stroke="var(--ink)" stroke-width="4" stroke-linecap="round"/>
-  <path d="M85 126 Q100 118 115 126 Q100 130 85 126 Z" fill="var(--ink)"/>
-  <path d="M140 82 q6 6 0 12" stroke="var(--teal)" stroke-width="3" fill="none" stroke-linecap="round"/>
-  <path d="M60 88 q-6 6 0 12" stroke="var(--teal)" stroke-width="3" fill="none" stroke-linecap="round"/>
-</svg>`;
-
-const PET_DEAD_SVG = `
-<svg viewBox="0 0 200 200" width="150" height="150" role="img" aria-label="Pet needs reviving">
-  <ellipse cx="100" cy="176" rx="50" ry="7" fill="rgba(0,0,0,0.06)"/>
-  <path d="M56 112 Q56 82 100 80 Q144 82 144 112 Q146 140 100 144 Q54 140 56 112 Z" fill="var(--ink-faint)" opacity="0.7"/>
-  <path d="M94 80 Q98 68 90 62 Q98 60 102 68 Q102 74 94 80 Z" fill="var(--ink-faint)"/>
-  <path d="M68 102 L82 110 M82 102 L68 110" stroke="var(--ink)" stroke-width="4" stroke-linecap="round"/>
-  <path d="M118 102 L132 110 M132 102 L118 110" stroke="var(--ink)" stroke-width="4" stroke-linecap="round"/>
-  <path d="M86 126 L114 126" stroke="var(--ink)" stroke-width="4" stroke-linecap="round"/>
-</svg>`;
 
 function renderPet() {
   const wrap = document.getElementById('pet-display');
   const sub = document.getElementById('pet-card-sub');
-  if (!wrap) return;
+  const figure = document.getElementById('chibi-figure');
+  const statusEl = document.getElementById('pet-status-text');
+  const flavorEl = document.getElementById('pet-flavor-text');
+  if (!wrap || !figure) return;
 
-  if (!canTrackPet()) {
-    const missingWeight = getLatestWeightKg() === null;
-    wrap.innerHTML = `<p class="empty-note" style="text-align:center; padding:10px 0;">
-      ${missingWeight ? 'Log a weigh-in and complete' : 'Complete'} your
-      <button type="button" class="link-btn" data-tab="settings">profile in Settings</button>
-      (birthdate, sex, height) — or just enter your resting calories directly there — to bring your pet to life.
-    </p>`;
-    if (sub) sub.textContent = `Healthy on a ${PET_DEFICIT_TARGET}+ kcal deficit day.`;
+  const progress = computeCharacterProgress();
+
+  if (!progress) {
+    figure.style.setProperty('--torso-w', '96px');
+    figure.style.setProperty('--limb-w', '20px');
+    figure.style.setProperty('--leg-w', '22px');
+    if (statusEl) statusEl.innerHTML = `Log your first <button type="button" class="link-btn" data-tab="weight">weigh-in</button> to bring your character to life.`;
+    if (flavorEl) flavorEl.textContent = '';
+    if (sub) sub.textContent = 'Mirrors your weight as you progress.';
     return;
   }
 
-  const status = computePetStatus();
-  const svgByHealth = { healthy: PET_HEALTHY_SVG, slight: PET_SLIGHT_SVG, severe: PET_SEVERE_SVG, dead: PET_DEAD_SVG };
-  const labelByHealth = { healthy: 'Healthy', slight: 'Feeling a bit off', severe: 'Very sick', dead: "Hasn't made it" };
+  const clampedPct = Math.max(CHAR_MIN_PCT, Math.min(CHAR_MAX_PCT, progress.pct));
+  // 0 (slimmest) .. 1 (largest), where 0.5 is the neutral starting proportions
+  const t = (clampedPct - CHAR_MIN_PCT) / (CHAR_MAX_PCT - CHAR_MIN_PCT);
+  const torsoW = Math.round(60 + t * (132 - 60));
+  const limbW = Math.round(13 + t * (27 - 13));
+  const legW = Math.round(15 + t * (29 - 15));
 
-  let flavorHTML = '';
-  if (status.health === 'healthy' && status.consecutiveGood > 0) {
-    flavorHTML = `<p class="pet-flavor">${status.consecutiveGood}-day streak of ${PET_DEFICIT_TARGET}+ kcal deficits</p>`;
-  } else if (status.health === 'healthy') {
-    flavorHTML = `<p class="pet-flavor">Hit a ${PET_DEFICIT_TARGET}+ kcal deficit to start a streak</p>`;
-  } else if (status.health !== 'dead') {
-    flavorHTML = `<p class="pet-flavor">${status.consecutiveBad} days under a ${PET_DEFICIT_TARGET} kcal deficit — get back on track to help recovery</p>`;
+  figure.style.setProperty('--torso-w', torsoW + 'px');
+  figure.style.setProperty('--limb-w', limbW + 'px');
+  figure.style.setProperty('--leg-w', legW + 'px');
+
+  const pctAbs = Math.abs(Math.round(progress.pct * 1000) / 10); // one decimal place
+
+  if (progress.singleEntry) {
+    if (statusEl) statusEl.textContent = 'Just getting started';
+    if (flavorEl) flavorEl.textContent = 'Log more weigh-ins to see your character change over time.';
+  } else if (progress.pct <= -0.005) {
+    if (statusEl) statusEl.textContent = 'Slimming down';
+    if (flavorEl) flavorEl.textContent = `${pctAbs}% down from your starting weight`;
+  } else if (progress.pct >= 0.005) {
+    if (statusEl) statusEl.textContent = 'Trending up';
+    if (flavorEl) flavorEl.textContent = `${pctAbs}% up from your starting weight`;
   } else {
-    flavorHTML = `<p class="pet-flavor">${status.consecutiveBad} days in a row without a ${PET_DEFICIT_TARGET} kcal deficit</p>`;
+    if (statusEl) statusEl.textContent = 'Holding steady';
+    if (flavorEl) flavorEl.textContent = 'Right around your starting weight';
   }
 
-  const reviveButtonHTML = status.health === 'dead'
-    ? `<button type="button" class="primary" id="pet-revive-btn" style="margin-top:12px;">Revive</button>`
-    : '';
-
-  wrap.innerHTML = `
-    <div class="pet-stage">${svgByHealth[status.health]}</div>
-    <p class="pet-status pet-status-${status.health}">${labelByHealth[status.health]}</p>
-    ${flavorHTML}
-    ${reviveButtonHTML}
-  `;
-  if (sub) sub.textContent = `Healthy on a ${PET_DEFICIT_TARGET}+ kcal deficit day.`;
-
-  const reviveBtn = document.getElementById('pet-revive-btn');
-  if (reviveBtn) {
-    reviveBtn.addEventListener('click', () => {
-      state.settings.petLastRevivedDate = todayStr();
-      saveJSON(STORE.settings, state.settings);
-      renderPet();
-    });
-  }
+  if (sub) sub.textContent = 'Mirrors your weight as you progress.';
 }
 
 function sumMacros(entries) {
@@ -3774,6 +3751,7 @@ function setupForceRefresh() {
     }
   });
 }
+
 
 
 
