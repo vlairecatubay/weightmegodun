@@ -23,6 +23,7 @@
 
 
 
+
 <link rel="manifest" href="manifest.json" />
 <meta name="theme-color" content="#A29CF0" />
 <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png" />
@@ -51,7 +52,9 @@
 
 
 
+
 <style>
+
 
 
 
@@ -209,6 +212,111 @@ html[data-theme="sunset"]{
   --positive: #4E8F6E;
   --positive-soft: #E8F1EC;
   --danger-soft: #F5E4DC;
+}
+
+html[data-theme="blossom"]{
+  --bg: #FCEEF3;
+  --surface: #FFFFFF;
+  --ink: #3D1F2B;
+  --ink-soft: #8C6270;
+  --ink-faint: #C9A3B0;
+
+  --periwinkle: #E0729A;
+  --periwinkle-soft: #FBE0EA;
+  --coral: #F2A0AE;
+  --coral-soft: #FCEBEE;
+  --coral-deep: #E0748A;
+  --peach: #F2C4A0;
+  --peach-soft: #FBF0E4;
+  --teal: #7FB8B0;
+  --teal-soft: #E7F4F2;
+  --pink: #D98FC7;
+  --pink-soft: #F8E9F5;
+  --yellow: #E0B23E;
+  --yellow-soft: #FAF0DC;
+  --sage: #9BB07A;
+  --sage-soft: #EFF4E9;
+
+  --warn: #B5761E;
+  --danger: #D9536E;
+}
+
+html[data-theme="blossom"]{
+  --hero-start: #E0729A;
+  --hero-end: #B84F78;
+  --positive: #4E8F6E;
+  --positive-soft: #E8F1EC;
+  --danger-soft: #FBE3E8;
+}
+
+html[data-theme="ocean"]{
+  --bg: #E9F1F7;
+  --surface: #FFFFFF;
+  --ink: #12293B;
+  --ink-soft: #5D7A8C;
+  --ink-faint: #A9C0CE;
+
+  --periwinkle: #3F8FC7;
+  --periwinkle-soft: #E2F0F9;
+  --coral: #6FB8D6;
+  --coral-soft: #E7F3F9;
+  --coral-deep: #337FB0;
+  --peach: #7FCADB;
+  --peach-soft: #E7F6F8;
+  --teal: #2E9E8F;
+  --teal-soft: #E2F5F2;
+  --pink: #5B8FD4;
+  --pink-soft: #E9F0FB;
+  --yellow: #D9A73E;
+  --yellow-soft: #F7EDD8;
+  --sage: #4F9E82;
+  --sage-soft: #E5F4EE;
+
+  --warn: #A6752B;
+  --danger: #C1543E;
+}
+
+html[data-theme="ocean"]{
+  --hero-start: #3F8FC7;
+  --hero-end: #1F5C8A;
+  --positive: #2E8F7A;
+  --positive-soft: #E1F3EE;
+  --danger-soft: #F5E4DC;
+}
+
+html[data-theme="mono"]{
+  --bg: #F0F0F0;
+  --surface: #FFFFFF;
+  --ink: #141414;
+  --ink-soft: #666666;
+  --ink-faint: #A3A3A3;
+
+  --periwinkle: #3A3A3A;
+  --periwinkle-soft: #E5E5E5;
+  --coral: #7A7A7A;
+  --coral-soft: #ECECEC;
+  --coral-deep: #4D4D4D;
+  --peach: #9E9E9E;
+  --peach-soft: #F0F0F0;
+  --teal: #5C5C5C;
+  --teal-soft: #EAEAEA;
+  --pink: #8C8C8C;
+  --pink-soft: #EFEFEF;
+  --yellow: #6E6E6E;
+  --yellow-soft: #ECECEC;
+  --sage: #707070;
+  --sage-soft: #EDEDED;
+
+  --warn: #5C5C5C;
+  --danger: #B33A3A;
+}
+
+html[data-theme="mono"]{
+  --hero-start: #3A3A3A;
+  --hero-end: #141414;
+  --positive: #3D7A52;
+  --positive-soft: #E3EFE7;
+  --danger-soft: #F5E2E2;
 }
 
 body{
@@ -385,67 +493,11 @@ body{
 .ebv-banner-sub{ font-size:10.5px; color:rgba(255,255,255,0.8); margin-top:1px; font-weight:500; }
 .ebv-banner.neutral .ebv-banner-sub{ color: var(--ink-faint); }
 
-/* ---------- Character card (chibi, pure CSS, weight-driven proportions) ---------- */
+/* ---------- Character card (SVG, weight-driven body scale) ---------- */
 #pet-display{ display:flex; flex-direction:column; align-items:center; text-align:center; padding: 6px 0 2px; }
 .chibi-stage{ width: 100%; display:flex; justify-content:center; margin-bottom: 6px; }
-
-.chibi{
-  --torso-w: 96px; --limb-w: 20px; --leg-w: 22px;
-  position:relative; width:220px; height:266px; flex-shrink:0;
-  transition: --torso-w .5s ease; /* no-op in browsers without var transitions, harmless */
-}
-.chibi-hair-back{
-  width:132px; height:150px; border-radius: 66px 66px 46px 46px;
-  background:#221B1B; position:absolute; top:18px; left:44px; z-index:1;
-}
-.chibi-ear{ width:14px; height:20px; border-radius:50%; background:#F0C29C; position:absolute; top:60px; z-index:1; }
-.chibi-ear.left{ left:52px; }
-.chibi-ear.right{ left:154px; }
-.chibi-head{
-  width:108px; height:108px; border-radius:50%;
-  background:#F0C29C; position:absolute; top:14px; left:56px; z-index:2;
-}
-.chibi-hair-front{
-  width:112px; height:42px; border-radius: 60px 60px 6px 6px;
-  background:#221B1B; position:absolute; top:12px; left:54px; z-index:3;
-}
-.chibi-eye{ width:19px; height:8px; background:#2B2118; border-radius:50%; position:absolute; top:65px; z-index:4; }
-.chibi-eye.left{ left:78px; transform:rotate(-6deg); }
-.chibi-eye.right{ left:122px; transform:rotate(6deg); }
-.chibi-cheek{ width:13px; height:7px; border-radius:50%; background:#F0958A; opacity:0.55; position:absolute; top:80px; z-index:3; }
-.chibi-cheek.left{ left:68px; }
-.chibi-cheek.right{ left:138px; }
-.chibi-mouth{
-  width:10px; height:5px; border:2px solid #7A4A34; border-top:none; border-radius:0 0 10px 10px;
-  position:absolute; top:92px; left:105px; z-index:4;
-}
-.chibi-neck{ width:22px; height:16px; background:#E0AD82; position:absolute; top:118px; left:99px; z-index:1; }
-
-.chibi-torso{
-  width: var(--torso-w); height:76px; border-radius:28px 28px 18px 18px;
-  background: var(--periwinkle); position:absolute; top:130px;
-  left:calc(50% - (var(--torso-w) / 2)); z-index:2;
-}
-.chibi-collar{
-  width:28px; height:14px; border-radius:0 0 14px 14px; background: var(--hero-end);
-  position:absolute; top:130px; left:calc(50% - 14px); z-index:3;
-}
-.chibi-arm{
-  width: var(--limb-w); height:58px; border-radius:10px; background: var(--periwinkle);
-  position:absolute; top:136px; z-index:1; transform-origin: top center;
-}
-.chibi-arm.left{ left:calc(50% - (var(--torso-w) / 2) - (var(--limb-w) * 0.6)); transform:rotate(9deg); }
-.chibi-arm.right{ left:calc(50% + (var(--torso-w) / 2) - (var(--limb-w) * 0.4)); transform:rotate(-9deg); }
-.chibi-hand{ width:16px; height:16px; border-radius:50%; background:#F0C29C; position:absolute; top:188px; z-index:1; }
-.chibi-hand.left{ left:calc(50% - (var(--torso-w) / 2) - (var(--limb-w) * 0.6) - 3px); }
-.chibi-hand.right{ left:calc(50% + (var(--torso-w) / 2) - (var(--limb-w) * 0.4) - 3px); }
-
-.chibi-leg{ width: var(--leg-w); height:50px; border-radius:8px; background:#3B3550; position:absolute; top:200px; z-index:1; }
-.chibi-leg.left{ left:calc(50% - var(--leg-w) - 4px); }
-.chibi-leg.right{ left:calc(50% + 4px); }
-.chibi-shoe{ width:24px; height:13px; border-radius:7px; background:#221B1B; position:absolute; top:243px; z-index:2; }
-.chibi-shoe.left{ left:calc(50% - var(--leg-w) - 8px); }
-.chibi-shoe.right{ left:calc(50% + 1px); }
+#chibi-figure{ max-width: 180px; height:auto; }
+#chibiBodyGroup{ transition: transform .5s ease; }
 
 .pet-status{ font-family:'Poppins', sans-serif; font-weight:700; font-size:15px; margin:0; color: var(--ink); }
 .pet-flavor{ font-size:12px; color:var(--ink-faint); margin:5px 0 0; max-width: 260px; }
@@ -764,9 +816,11 @@ main{ display: block; margin-top: 4px; }
 
 
 
+
 </style>
 </head>
 <body>
+
 
 
 
@@ -880,22 +934,74 @@ main{ display: block; margin-top: 4px; }
         <p class="card-sub" id="pet-card-sub">Mirrors your weight as you progress.</p>
         <div id="pet-display">
           <div class="chibi-stage">
-            <div class="chibi" id="chibi-figure">
-              <div class="chibi-hair-back"></div>
-              <div class="chibi-ear left"></div><div class="chibi-ear right"></div>
-              <div class="chibi-head"></div>
-              <div class="chibi-hair-front"></div>
-              <div class="chibi-eye left"></div><div class="chibi-eye right"></div>
-              <div class="chibi-cheek left"></div><div class="chibi-cheek right"></div>
-              <div class="chibi-mouth"></div>
-              <div class="chibi-neck"></div>
-              <div class="chibi-arm left"></div><div class="chibi-arm right"></div>
-              <div class="chibi-hand left"></div><div class="chibi-hand right"></div>
-              <div class="chibi-torso"></div>
-              <div class="chibi-collar"></div>
-              <div class="chibi-leg left"></div><div class="chibi-leg right"></div>
-              <div class="chibi-shoe left"></div><div class="chibi-shoe right"></div>
-            </div>
+            <svg id="chibi-figure" viewBox="0 0 200 260" width="180" height="234" role="img" aria-label="Your character">
+              <defs>
+                <linearGradient id="chibiHairGrad" x1="0%" y1="0%" x2="20%" y2="100%">
+                  <stop offset="0%" stop-color="#362B20"/>
+                  <stop offset="100%" stop-color="#181310"/>
+                </linearGradient>
+                <linearGradient id="chibiShirtGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                  <stop offset="0%" stop-color="var(--periwinkle)"/>
+                  <stop offset="100%" stop-color="var(--hero-end)"/>
+                </linearGradient>
+              </defs>
+
+              <ellipse cx="100" cy="248" rx="52" ry="8" fill="rgba(20,10,30,0.08)"/>
+
+              <g id="chibiBodyGroup" style="transform-origin: 100px 190px;">
+                <rect x="78" y="205" width="16" height="38" rx="7" fill="#3B3550"/>
+                <rect x="106" y="205" width="16" height="38" rx="7" fill="#3B3550"/>
+                <rect x="76" y="238" width="20" height="11" rx="5" fill="#1C1712"/>
+                <rect x="104" y="238" width="20" height="11" rx="5" fill="#1C1712"/>
+                <rect x="58" y="150" width="16" height="52" rx="8" fill="url(#chibiShirtGrad)" transform="rotate(8 66 150)"/>
+                <rect x="126" y="150" width="16" height="52" rx="8" fill="url(#chibiShirtGrad)" transform="rotate(-8 134 150)"/>
+                <circle cx="63" cy="205" r="10" fill="#F3C9A4"/>
+                <circle cx="137" cy="205" r="10" fill="#F3C9A4"/>
+                <path d="M62 150 Q60 200 66 218 Q100 230 134 218 Q140 200 138 150 Q120 138 100 138 Q80 138 62 150 Z" fill="url(#chibiShirtGrad)"/>
+                <path d="M88 140 Q100 150 112 140 L108 152 Q100 158 92 152 Z" fill="var(--hero-end)"/>
+              </g>
+
+              <rect x="90" y="118" width="20" height="18" fill="#E0AD82"/>
+              <ellipse cx="55" cy="105" rx="8" ry="12" fill="#F3C9A4"/>
+              <ellipse cx="145" cy="105" rx="8" ry="12" fill="#F3C9A4"/>
+
+              <ellipse cx="100" cy="80" rx="62" ry="66" fill="url(#chibiHairGrad)"/>
+              <path d="M45 70 C 40 110, 44 160, 55 195 C 60 165, 58 120, 62 85 Z" fill="url(#chibiHairGrad)"/>
+              <path d="M155 70 C 160 110, 156 160, 145 195 C 140 165, 142 120, 138 85 Z" fill="url(#chibiHairGrad)"/>
+
+              <circle cx="100" cy="98" r="52" fill="#F3C9A4"/>
+
+              <path d="M48 88 C 46 55, 70 28, 100 28 C 130 28, 154 55, 152 88
+                       C 152 70, 140 60, 130 68
+                       C 128 56, 114 50, 105 60
+                       C 102 52, 98 52, 95 60
+                       C 86 50, 72 56, 70 68
+                       C 60 60, 48 70, 48 88 Z" fill="url(#chibiHairGrad)"/>
+
+              <path d="M74 88 Q82 82 90 87" stroke="#241C1C" stroke-width="2.6" fill="none" stroke-linecap="round"/>
+              <path d="M110 87 Q118 82 126 88" stroke="#241C1C" stroke-width="2.6" fill="none" stroke-linecap="round"/>
+
+              <g>
+                <ellipse cx="82" cy="100" rx="11" ry="7" fill="#fff" transform="rotate(-4 82 100)"/>
+                <circle cx="83" cy="100" r="5.4" fill="#4A3222"/>
+                <circle cx="83" cy="100" r="2.6" fill="#171012"/>
+                <circle cx="85" cy="98" r="1.3" fill="#fff"/>
+                <path d="M71 97 Q82 91 93 97" stroke="#241C1C" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+              </g>
+              <g>
+                <ellipse cx="118" cy="100" rx="11" ry="7" fill="#fff" transform="rotate(4 118 100)"/>
+                <circle cx="117" cy="100" r="5.4" fill="#4A3222"/>
+                <circle cx="117" cy="100" r="2.6" fill="#171012"/>
+                <circle cx="119" cy="98" r="1.3" fill="#fff"/>
+                <path d="M107 97 Q118 91 129 97" stroke="#241C1C" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+              </g>
+
+              <ellipse cx="72" cy="115" rx="7.5" ry="4.5" fill="#F0958A" opacity="0.5"/>
+              <ellipse cx="128" cy="115" rx="7.5" ry="4.5" fill="#F0958A" opacity="0.5"/>
+
+              <path d="M90 122 Q100 132 110 122 Q100 128 90 122 Z" fill="#B8544F"/>
+              <path d="M90 122 Q100 130 110 122" stroke="#241C1C" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+            </svg>
           </div>
           <p class="pet-status" id="pet-status-text"></p>
           <p class="pet-flavor" id="pet-flavor-text"></p>
@@ -1306,7 +1412,9 @@ main{ display: block; margin-top: 4px; }
 
 
 
+
 <script>
+
 
 
 
@@ -1444,6 +1552,33 @@ const THEMES = [
     measureColors: {
       waist: '#BF5B3D', hip: '#6FA592', upperArm: '#D98FA8',
       wrist: '#D9A73E', chest: '#8FAE6F', upperLeg: '#5B7FA6', lowerLeg: '#A6835A'
+    }
+  },
+  {
+    id: 'blossom',
+    name: 'Blossom',
+    preview: { bg: '#FCEEF3', accent: '#E0729A', surface: '#FFFFFF' },
+    measureColors: {
+      waist: '#E0729A', hip: '#7FB8B0', upperArm: '#D98FC7',
+      wrist: '#E0B23E', chest: '#9BB07A', upperLeg: '#F2A0AE', lowerLeg: '#C98F5E'
+    }
+  },
+  {
+    id: 'ocean',
+    name: 'Ocean',
+    preview: { bg: '#E9F1F7', accent: '#3F8FC7', surface: '#FFFFFF' },
+    measureColors: {
+      waist: '#3F8FC7', hip: '#2E9E8F', upperArm: '#5B8FD4',
+      wrist: '#D9A73E', chest: '#4F9E82', upperLeg: '#6FB8D6', lowerLeg: '#337FB0'
+    }
+  },
+  {
+    id: 'mono',
+    name: 'Mono',
+    preview: { bg: '#F0F0F0', accent: '#3A3A3A', surface: '#FFFFFF' },
+    measureColors: {
+      waist: '#2A2A2A', hip: '#5C5C5C', upperArm: '#7A7A7A',
+      wrist: '#4D4D4D', chest: '#8C8C8C', upperLeg: '#666666', lowerLeg: '#9E9E9E'
     }
   }
 ];
@@ -2217,17 +2352,15 @@ function computeCharacterProgress() {
 function renderPet() {
   const wrap = document.getElementById('pet-display');
   const sub = document.getElementById('pet-card-sub');
-  const figure = document.getElementById('chibi-figure');
+  const bodyGroup = document.getElementById('chibiBodyGroup');
   const statusEl = document.getElementById('pet-status-text');
   const flavorEl = document.getElementById('pet-flavor-text');
-  if (!wrap || !figure) return;
+  if (!wrap || !bodyGroup) return;
 
   const progress = computeCharacterProgress();
 
   if (!progress) {
-    figure.style.setProperty('--torso-w', '96px');
-    figure.style.setProperty('--limb-w', '20px');
-    figure.style.setProperty('--leg-w', '22px');
+    bodyGroup.style.transform = 'scaleX(1)';
     if (statusEl) statusEl.innerHTML = `Log your first <button type="button" class="link-btn" data-tab="weight">weigh-in</button> to bring your character to life.`;
     if (flavorEl) flavorEl.textContent = '';
     if (sub) sub.textContent = 'Mirrors your weight as you progress.';
@@ -2235,15 +2368,12 @@ function renderPet() {
   }
 
   const clampedPct = Math.max(CHAR_MIN_PCT, Math.min(CHAR_MAX_PCT, progress.pct));
-  // 0 (slimmest) .. 1 (largest), where 0.5 is the neutral starting proportions
+  // 0 (slimmest) .. 1 (largest), where 0.5 is the neutral starting proportions.
+  // Only the body group (torso/arms/legs) scales horizontally — the head stays
+  // a constant size, which is what keeps it reading as a "chibi" character.
   const t = (clampedPct - CHAR_MIN_PCT) / (CHAR_MAX_PCT - CHAR_MIN_PCT);
-  const torsoW = Math.round(60 + t * (132 - 60));
-  const limbW = Math.round(13 + t * (27 - 13));
-  const legW = Math.round(15 + t * (29 - 15));
-
-  figure.style.setProperty('--torso-w', torsoW + 'px');
-  figure.style.setProperty('--limb-w', limbW + 'px');
-  figure.style.setProperty('--leg-w', legW + 'px');
+  const scaleX = 0.72 + t * (1.32 - 0.72);
+  bodyGroup.style.transform = `scaleX(${scaleX.toFixed(3)})`;
 
   const pctAbs = Math.abs(Math.round(progress.pct * 1000) / 10); // one decimal place
 
@@ -3751,6 +3881,7 @@ function setupForceRefresh() {
     }
   });
 }
+
 
 
 
