@@ -20,6 +20,7 @@
 
 
 
+
 <link rel="manifest" href="manifest.json" />
 <meta name="theme-color" content="#A29CF0" />
 <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png" />
@@ -45,7 +46,9 @@
 
 
 
+
 <style>
+
 
 
 
@@ -699,9 +702,11 @@ main{ display: block; margin-top: 4px; }
 
 
 
+
 </style>
 </head>
 <body>
+
 
 
 
@@ -1216,7 +1221,9 @@ main{ display: block; margin-top: 4px; }
 
 
 
+
 <script>
+
 
 
 
@@ -2842,7 +2849,7 @@ const CALORIE_TOOL = {
             carbs: { type: 'number', description: 'Best-estimate grams of carbohydrates for this item.' },
             fat: { type: 'number', description: 'Best-estimate grams of fat for this item.' }
           },
-          required: ['name', 'calories', 'protein', 'carbs', 'fat']
+          required: ['name', 'calories']
         }
       }
     },
@@ -2874,10 +2881,12 @@ const EXERCISE_TOOL = {
 
 const CHAT_SYSTEM_PROMPT = "You are a friendly health assistant inside a personal tracking app called WeightMeGodun. You handle two kinds of logging. " +
   "(1) Food or drink: break it down into its distinct items (e.g. \"burger and fries and a coke\" is three items, not one) and call " +
-  "log_food_items with a best-estimate calorie and macro (protein/carbs/fat in grams) breakdown for each item. " +
+  "log_food_items with a best-estimate calorie for each item, plus your best-guess macros (protein/carbs/fat in grams) — macros are a nice-to-have, " +
+  "never skip logging an item just because you're unsure of the exact macros, a rough estimate is fine. " +
   "(2) Exercise or physical activity: call log_exercise with a best-estimate calories burned for each distinct activity mentioned. " +
   "A single message can include both (e.g. \"ran 5k then had a protein shake\" — call both tools). Use general nutrition/fitness knowledge " +
   "for estimates — don't ask clarifying questions first, just give your best estimate and note any assumptions briefly in your reply. " +
+  "Always call the relevant tool when food or exercise is mentioned, even briefly or vaguely worded. " +
   "If the message isn't about food or exercise (a question, greeting, etc.), just reply conversationally without calling either tool. " +
   "Keep replies brief, warm, and to the point — one or two sentences.";
 
@@ -2983,8 +2992,8 @@ async function sendChatMessage(text) {
         'anthropic-dangerous-direct-browser-access': 'true'
       },
       body: JSON.stringify({
-        model: 'claude-haiku-4-5-20251001',
-        max_tokens: 500,
+        model: 'claude-sonnet-5',
+        max_tokens: 1024,
         system: CHAT_SYSTEM_PROMPT,
         messages: history,
         tools: [CALORIE_TOOL, EXERCISE_TOOL]
@@ -3033,7 +3042,23 @@ async function sendChatMessage(text) {
     }
 
     if (!loggedSomething && !textParts) {
-      pushChatMessage({ role: 'assistant', text: "Got it, but I didn't catch anything to log there." });
+      // This shouldn't normally happen — log full diagnostics so it's actually
+      // debuggable (open devtools > console) instead of a silent mystery.
+      console.warn('WeightMeGodun chat: no text and no usable tool call in response.', {
+        stop_reason: data.stop_reason,
+        blocks,
+        foodCallFound: !!foodCall,
+        exerciseCallFound: !!exerciseCall,
+        foodCallInput: foodCall && foodCall.input,
+        exerciseCallInput: exerciseCall && exerciseCall.input
+      });
+      const truncated = data.stop_reason === 'max_tokens';
+      pushChatMessage({
+        role: truncated ? 'error' : 'assistant',
+        text: truncated
+          ? '⚠ The response got cut off before it finished — try a shorter message, or try again.'
+          : "Got it, but I didn't catch anything to log there — try rephrasing with a specific food or activity."
+      });
     }
   } catch (err) {
     console.error('Chat request error:', err);
@@ -3749,6 +3774,7 @@ function setupForceRefresh() {
     }
   });
 }
+
 
 
 
